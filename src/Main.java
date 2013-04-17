@@ -1,4 +1,4 @@
-import java.io.IOException;
+
 
 public class Main
 {
@@ -9,7 +9,7 @@ public class Main
 
         Boat boat = new Boat();
 
-        for ( int i = 0; i < 120 ; i++)
+        for ( int i = 0; i < 300 ; i++)
         {
             boat.update ();
             try
