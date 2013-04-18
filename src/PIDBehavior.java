@@ -27,18 +27,24 @@ public class PIDBehavior implements BoatBehavior
         boat.actuation.setSailTension ( sailPosition );
         boat.actuation.setRudderPosition ( (int)Math.round (  rudder) );
 
+        System.out.println (" I'm pidding ");
+
     }
 
     @Override
     public boolean needsToChange ()
     {
+        if (45 > Math.abs(getHeadingDifference ( desiredHeading, 270 )) )
+        {
+            return true;
+        }
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public BoatBehavior newBehavior ()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new TackBehavior ();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     void setSail()
@@ -87,7 +93,7 @@ public class PIDBehavior implements BoatBehavior
         double MAX = 90 ;                 //For Current Saturation
         double MIN = -90 ;
         double Kp =  0.1 ;
-        double Kd  = 0.02;
+        double Kd  = 0.01;
         double Ki = 0.005;
 
         double pre_error = 0;

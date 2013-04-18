@@ -23,6 +23,7 @@ public class Actuation
 
     public void setRudderPosition ( int rudderPosition )
     {
+
         this.rudderPosition = rudderPosition;
     }
 

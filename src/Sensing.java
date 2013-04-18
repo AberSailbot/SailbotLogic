@@ -12,22 +12,35 @@ public class Sensing
     private int windDirection;
     private Position position;
 
+    private int waypointHeading;
+
+    private Position nextWayPoint;
+
     public int getWaypointHeading ()
     {
-        return waypointHeading;
+        //return waypointHeading;
+
+        return (int)Math.round (  Position.getHeadingBetween ( position, nextWayPoint )) ;
     }
 
-    private int waypointHeading;
+
 
     public Sensing ()
     {
         position = new Position ();
+        nextWayPoint = new Position ();
     }
 
+    public Position getNextWayPoint ()
+    {
+        return nextWayPoint;
+    }
 
     public int getHeading ()
     {
         return heading;
+
+
     }
 
 
@@ -57,11 +70,24 @@ public class Sensing
         //needs to be calculated onboard at some point
         waypointHeading = Integer.parseInt ( boat.communication.getMessage () );
 
+        ///////////////////////////
+
+        boat.communication.sendMessage ( "get waypointnum" );
+        int wayPointNumber = Integer.parseInt (boat.communication.getMessage ());
+
+        boat.communication.sendMessage ( "get waypointnorthing " + wayPointNumber );
+        nextWayPoint.setLatitude ( Math.abs(Double.parseDouble ( boat.communication.getMessage () )/100000000 * 360) );
+
+        boat.communication.sendMessage ( "get waypointeasting " + wayPointNumber );
+        nextWayPoint.setLongitude ( Double.parseDouble ( boat.communication.getMessage () )/100000000 * 360 );
+
+        ///////////////////
+
         boat.communication.sendMessage ( "get easting" );
-        double easting  = Double.parseDouble ( boat.communication.getMessage ());
+        double easting  = Double.parseDouble ( boat.communication.getMessage ())/100000000  * 360;
 
         boat.communication.sendMessage ( "get northing" );
-        double northing  = Double.parseDouble ( boat.communication.getMessage ());
+        double northing  = Math.abs(Double.parseDouble ( boat.communication.getMessage ())/100000000 * 360);
 
 
 
@@ -71,9 +97,12 @@ public class Sensing
 
       }
 
+
+
     public String toString()
     {
         return "Heading: " + heading + "\n"
+                + "DesiredHeading: " + getWaypointHeading () + "\n"
                 + "wind: " + windDirection + "\n"
                 + "lat: " + position.getLatitude () + "\n"
                 + "lon: " + position.getLongitude () + "\n"

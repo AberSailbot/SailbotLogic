@@ -39,12 +39,14 @@ public class Boat
         System.out.println ("ping" + '\n' + sensing.toString ());
 
 
+        behavior.runOn ( this );
+
         if ( behavior.needsToChange () )
         {
             behavior = behavior.newBehavior ();
         }
 
-        behavior.runOn ( this );
+
 
         actuation.UpdateTo ( this );
 
