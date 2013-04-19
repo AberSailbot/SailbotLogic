@@ -76,18 +76,18 @@ public class Sensing
         int wayPointNumber = Integer.parseInt (boat.communication.getMessage ());
 
         boat.communication.sendMessage ( "get waypointnorthing " + wayPointNumber );
-        nextWayPoint.setLatitude ( Math.abs(Double.parseDouble ( boat.communication.getMessage () )/100000000 * 360) );
+        nextWayPoint.setLatitude ( Double.parseDouble ( boat.communication.getMessage () )/10000000 * 10 + 100) ;
 
         boat.communication.sendMessage ( "get waypointeasting " + wayPointNumber );
-        nextWayPoint.setLongitude ( Double.parseDouble ( boat.communication.getMessage () )/100000000 * 360 );
+        nextWayPoint.setLongitude ( Double.parseDouble ( boat.communication.getMessage () )/10000000 * 10 + 100);
 
         ///////////////////
 
         boat.communication.sendMessage ( "get easting" );
-        double easting  = Double.parseDouble ( boat.communication.getMessage ())/100000000  * 360;
+        double easting  =    Double.parseDouble ( boat.communication.getMessage ())/10000000  * 10 + 100;
 
         boat.communication.sendMessage ( "get northing" );
-        double northing  = Math.abs(Double.parseDouble ( boat.communication.getMessage ())/100000000 * 360);
+        double northing  = Double.parseDouble ( boat.communication.getMessage ())/10000000  * 10 + 100;
 
 
 

@@ -12,17 +12,16 @@ public class Position
 
     public static double getHeadingBetween( Position a, Position b )
     {
-        double deltaLon = Math.abs( b.getLongitude () - a.getLongitude ());
+        double deltaLon =  b.getLongitude () - a.getLongitude ();
 
         double y = Math.sin(deltaLon) * Math.cos(b.getLatitude ());
         double x = Math.cos(a.getLatitude ())*Math.sin(b.getLatitude ()) -
                 Math.sin(a.getLatitude ())*Math.cos(b.getLatitude ())*Math.cos(deltaLon);
-        double hdg =  Math.toDegrees ( Math.atan2 ( y, x ) );
+        double hdg =  Math.toDegrees ( (Math.atan2 ( y, x )) +270  ) %360;
 
-        if (hdg < 0 )
-        {
-            hdg += 360;
-        }
+        //hdg = hdg + 180;
+
+
 
 
 
