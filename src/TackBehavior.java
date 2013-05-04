@@ -19,9 +19,9 @@ public class TackBehavior implements BoatBehavior{
 		while(5 < Math.abs(getHeadingDifference(heading, desiredHeading + 45))){
 
 			setSail();
-			boat.actuation.setRudderPosition(90);
-			boat.actuation.setSailTension(sailPosition);
-			boat.actuation.UpdateTo(boat);
+			boat.updateRudder(90);
+			boat.updateSail(sailPosition);
+			
 			System.out.println("R");
 			try{
 				boat.readSensors();
@@ -35,9 +35,8 @@ public class TackBehavior implements BoatBehavior{
 		}
 
 		setSail();
-		boat.actuation.setRudderPosition(0);
-		boat.actuation.setSailTension(sailPosition);
-		boat.actuation.UpdateTo(boat);
+		boat.updateRudder(0);
+		boat.updateSail(sailPosition);
 		try{
 			Thread.sleep(1000);
 		}catch(InterruptedException e){
@@ -49,9 +48,8 @@ public class TackBehavior implements BoatBehavior{
 
 		while(5 < Math.abs(getHeadingDifference(heading, desiredHeading - 45))){
 			setSail();
-			boat.actuation.setRudderPosition(270);
-			boat.actuation.setSailTension(sailPosition);
-			boat.actuation.UpdateTo(boat);
+			boat.updateRudder(270);
+			boat.updateSail(sailPosition);
 
 			System.out.println("L");
 
@@ -69,9 +67,8 @@ public class TackBehavior implements BoatBehavior{
 		}
 
 		setSail();
-		boat.actuation.setRudderPosition(0);
-		boat.actuation.setSailTension(sailPosition);
-		boat.actuation.UpdateTo(boat);
+		boat.updateRudder(0);
+		boat.updateSail(sailPosition);
 		try{
 			Thread.sleep(1000);
 		}catch(InterruptedException e){

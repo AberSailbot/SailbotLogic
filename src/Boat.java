@@ -6,8 +6,6 @@ import java.io.IOException;
 public class Boat{
 	public BoatBehavior behavior;
 	public Communication com;
-	public Actuation actuation;
-	public Sensing sensing;
 	public Route route;
 
 	private Position position;
@@ -16,11 +14,12 @@ public class Boat{
 	private int waypointHeading;
 	private Position nextWayPoint;
 
+	private int sailTension;
+	private int rudderPosition;
+
 	public Boat(){
 		behavior = new PIDBehavior();
 		com = new Communication();
-		actuation = new Actuation();
-		sensing = new Sensing();
 		route = new Route();
 
 		position = new Position();
@@ -32,10 +31,10 @@ public class Boat{
 		try{
 			readSensors();
 		}catch(IOException e){
-			e.printStackTrace(); 
+			e.printStackTrace();
 		}
 
-		//System.out.println("ping" + '\n' + sensing.toString());
+		// System.out.println("ping" + '\n' + sensing.toString());
 
 		behavior.runOn(this);
 
@@ -43,7 +42,8 @@ public class Boat{
 			behavior = behavior.newBehavior();
 		}
 
-		actuation.UpdateTo(this);
+		this.updateRudder(rudderPosition);
+		this.updateSail(sailTension);
 
 		try{
 			Thread.sleep(1000);
@@ -82,6 +82,28 @@ public class Boat{
 		double northing = Double.parseDouble(com.getMessage()) / 10000000 * 10 + 100;
 
 		position.set(easting, northing);
+	}
+
+	public void updateRudder(int position){
+
+		this.rudderPosition = position;
+
+		try{
+			com.sendOneWayMessage("set rudder " + rudderPosition);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void updateSail(int tension){
+
+		this.sailTension = tension;
+
+		try{
+			com.sendOneWayMessage("set sail " + sailTension);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 
 	public Position getPosition(){

@@ -18,10 +18,9 @@ public class PIDBehavior implements BoatBehavior{
 
 		setSail();
 		setRudder();
-
-		boat.actuation.setSailTension(sailPosition);
-		boat.actuation.setRudderPosition((int) Math.round(rudder));
-
+		boat.updateRudder((int) Math.round(rudder));
+		boat.updateSail(sailPosition);
+		
 		System.out.println(" I'm pidding ");
 
 	}
