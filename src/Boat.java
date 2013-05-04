@@ -1,12 +1,13 @@
 import java.io.IOException;
 
 /**
- * Created with IntelliJ IDEA. User: thip Date: 17/04/2013 Time: 11:37
+ * @author thip
+ * @author Kamil Mrowiec <kam20@aber.ac.uk>
+ * @version 1.0 (4 May 2013)
  */
 public class Boat{
 	public BoatBehavior behavior;
 	public Communication com;
-	public Route route;
 
 	private Position position;
 	private int heading;
@@ -20,8 +21,6 @@ public class Boat{
 	public Boat(){
 		behavior = new PIDBehavior();
 		com = new Communication();
-		route = new Route();
-
 		position = new Position();
 		nextWayPoint = new Position();
 	}
@@ -34,9 +33,8 @@ public class Boat{
 			e.printStackTrace();
 		}
 
-		// System.out.println("ping" + '\n' + sensing.toString());
 
-		behavior.runOn(this);
+		behavior.applyBehavior(this);
 
 		if(behavior.needsToChange()){
 			behavior = behavior.newBehavior();
@@ -55,31 +53,31 @@ public class Boat{
 
 	public void readSensors() throws IOException{
 
-		com.sendMessage("get compass");
-		heading = Integer.parseInt(com.getMessage());
+		com.sendRequest("get compass");
+		heading = Integer.parseInt(com.readMessage());
 
-		com.sendMessage("get wind_dir");
-		windDirection = Integer.parseInt(com.getMessage());
+		com.sendRequest("get wind_dir");
+		windDirection = Integer.parseInt(com.readMessage());
 
-		com.sendMessage("get waypointdir");
-		waypointHeading = Integer.parseInt(com.getMessage());
+		com.sendRequest("get waypointdir");
+		waypointHeading = Integer.parseInt(com.readMessage());
 
-		com.sendMessage("get waypointnum");
-		int wayPointNumber = Integer.parseInt(com.getMessage());
+		com.sendRequest("get waypointnum");
+		int wayPointNumber = Integer.parseInt(com.readMessage());
 
-		com.sendMessage("get waypointnorthing " + wayPointNumber);
+		com.sendRequest("get waypointnorthing " + wayPointNumber);
 		nextWayPoint
-				.setLatitude(Double.parseDouble(com.getMessage()) / 10000000 * 10 + 100);
+				.setLatitude(Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100);
 
-		com.sendMessage("get waypointeasting " + wayPointNumber);
+		com.sendRequest("get waypointeasting " + wayPointNumber);
 		nextWayPoint
-				.setLongitude(Double.parseDouble(com.getMessage()) / 10000000 * 10 + 100);
+				.setLongitude(Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100);
 
-		com.sendMessage("get easting");
-		double easting = Double.parseDouble(com.getMessage()) / 10000000 * 10 + 100;
+		com.sendRequest("get easting");
+		double easting = Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100;
 
-		com.sendMessage("get northing");
-		double northing = Double.parseDouble(com.getMessage()) / 10000000 * 10 + 100;
+		com.sendRequest("get northing");
+		double northing = Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100;
 
 		position.set(easting, northing);
 	}
@@ -89,7 +87,7 @@ public class Boat{
 		this.rudderPosition = position;
 
 		try{
-			com.sendOneWayMessage("set rudder " + rudderPosition);
+			com.sendMessage("set rudder " + rudderPosition);
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -100,7 +98,7 @@ public class Boat{
 		this.sailTension = tension;
 
 		try{
-			com.sendOneWayMessage("set sail " + sailTension);
+			com.sendMessage("set sail " + sailTension);
 		}catch(IOException e){
 			e.printStackTrace();
 		}

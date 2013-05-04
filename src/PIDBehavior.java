@@ -1,17 +1,14 @@
 /**
- * Created with IntelliJ IDEA. User: thip Date: 17/04/2013 Time: 20:14
+ * @author thip
+ * @author Kamil Mrowiec <kam20@aber.ac.uk>
+ * @version 1.0 (4 May 2013)
  */
-public class PIDBehavior implements BoatBehavior{
+public class PIDBehavior extends BoatBehavior{
 
-	int windDirection;
-	int heading;
-	int desiredHeading;
-
-	int sailPosition;
 	double rudder;
 
 	@Override
-	public void runOn(Boat boat){
+	public void applyBehavior(Boat boat){
 		windDirection = boat.getWindDirection();
 		heading = boat.getHeading();
 		desiredHeading = boat.getWaypointHeading();
@@ -36,37 +33,6 @@ public class PIDBehavior implements BoatBehavior{
 	@Override
 	public BoatBehavior newBehavior(){
 		return new TackBehavior(); 
-	}
-
-	void setSail(){
-
-		// Shamelessly stolen from Colin (for now)
-
-		if(windDirection < 180){
-			if(windDirection < 70)
-				sailPosition = 0;
-			else if(windDirection < 80)
-				sailPosition = 18;
-			else if(windDirection < 90)
-				sailPosition = 36;
-			else if(windDirection < 110)
-				sailPosition = 54;
-			else
-				sailPosition = 72;
-		}else{
-			if(windDirection >= 290)
-				sailPosition = 0;
-			else if(windDirection >= 280)
-				sailPosition = 342;
-			else if(windDirection >= 270)
-				sailPosition = 324;
-			else if(windDirection >= 250)
-				sailPosition = 306;
-			else
-				sailPosition = 288;
-		}
-
-		System.out.println("I am setting the sail to " + sailPosition + '\n');
 	}
 
 	double PIDcal(int setpoint, int actual_position){
@@ -119,13 +85,4 @@ public class PIDBehavior implements BoatBehavior{
 		}
 	}
 
-	int getHeadingDifference(int heading1, int heading2){
-		int result = heading1 - heading2;
-
-		if(result < -180)
-			return 360 + result;
-		if(result > 180)
-			return 0 - (360 - result);
-		return result;
-	}
 }
