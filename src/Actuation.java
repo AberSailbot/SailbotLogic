@@ -31,8 +31,8 @@ public class Actuation
     {
         try
         {
-            boat.communication.sendOneWayMessage ( "set rudder " + rudderPosition );
-            boat.communication.sendOneWayMessage ( "set sail " + sailTension );
+            boat.com.sendOneWayMessage ( "set rudder " + rudderPosition );
+            boat.com.sendOneWayMessage ( "set sail " + sailTension );
         } catch ( IOException e )
         {
             e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.

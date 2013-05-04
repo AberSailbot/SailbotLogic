@@ -12,45 +12,29 @@ public class Communication
 {
 
     Socket socket;
-
     PrintWriter transmit;
     BufferedReader receive;
 
-    public Communication ()
+    public Communication()
     {
-        try
-        {
-            socket = new Socket("localhost", 5555);
-        } catch ( IOException e )
-        {
-            e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        //socket.
-        try
-        {
-            transmit = new PrintWriter ( socket.getOutputStream (), true );
-        } catch ( IOException e )
-        {
-            e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        try
-        {
-            receive = new BufferedReader ( new InputStreamReader ( socket.getInputStream () ) );
-        } catch ( IOException e )
-        {
-            e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
-        }
+		try{
+			socket = new Socket("localhost", 5555);
+			transmit = new PrintWriter(socket.getOutputStream(), true);
+			receive = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
 
-        //socket.connect ( );
+		}catch (Exception ex){
+			ex.printStackTrace();
+		}
     }
 
-    public void sendMessage ( String message ) throws IOException
+	public void sendMessage(String message) throws IOException
     {
         transmit.println ( message );
     }
 
 
-    public String getMessage ()  throws  IOException
+	public String getMessage() throws IOException
     {
 
         String message = "";
@@ -69,20 +53,20 @@ public class Communication
 
     }
 
-    public void clean()
-    {
-        try { socket.close (); } catch ( Exception e) {} ;
-    }
+	public void clean() {
+		try {
+			socket.close();
+		} catch (Exception e) {
+		}
+	}
 
-    public boolean isAlive()
-    {
-        return socket.isConnected ();
-    }
+	public boolean isAlive() {
+		return socket.isConnected();
+	}
 
-    public void sendOneWayMessage ( String s ) throws IOException
-    {
-        sendMessage ( s );
-        getMessage (); //clears the buffer;
+	public void sendOneWayMessage(String s) throws IOException {
+		sendMessage(s);
+		getMessage(); // clears the buffer;
 
-    }
+	}
 }
