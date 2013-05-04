@@ -77,20 +77,12 @@ public class TackBehavior extends BoatBehavior{
 	}
 
 	@Override
-	public boolean needsToChange(){
-
+	public BoatBehavior nextBehavior(){
 		if(45 < Math.abs(getHeadingDifference(desiredHeading, 270))){
 			System.out.println("leaving tack");
-			return true;
-		}
-		return false; // To change body of implemented methods use File |
-						// Settings | File Templates.
-
-	}
-
-	@Override
-	public BoatBehavior newBehavior(){
-		return new PIDBehavior(); 
+			return new PIDBehavior(); 
+		}else return this;
+		
 	}
 
 }

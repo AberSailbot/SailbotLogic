@@ -23,16 +23,10 @@ public class PIDBehavior extends BoatBehavior{
 	}
 
 	@Override
-	public boolean needsToChange(){
-		if(45 > Math.abs(getHeadingDifference(desiredHeading, 270))){
-			return true;
-		}
-		return false; 
-	}
-
-	@Override
-	public BoatBehavior newBehavior(){
-		return new TackBehavior(); 
+	public BoatBehavior nextBehavior(){
+		if(45 > Math.abs(getHeadingDifference(desiredHeading, 270)))
+			return new TackBehavior();
+		else return this;
 	}
 
 	double PIDcal(int setpoint, int actual_position){

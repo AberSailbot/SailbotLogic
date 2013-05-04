@@ -11,8 +11,7 @@ public abstract class BoatBehavior{
 	protected int sailPosition;
 	
 	abstract void applyBehavior(Boat boat);
-	abstract boolean needsToChange();
-	abstract BoatBehavior newBehavior();
+	abstract BoatBehavior nextBehavior();
 	
 	protected void setSail(){
 		

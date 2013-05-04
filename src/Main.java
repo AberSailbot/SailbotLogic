@@ -9,9 +9,9 @@ public class Main{
 
 		Boat boat = new Boat();
 
-		for(int i = 0; i < 300; i++){
-			boat.update();
+		for(;;){
 			try{
+				boat.update();
 				Thread.sleep(100);
 			}catch(InterruptedException e){
 				e.printStackTrace();

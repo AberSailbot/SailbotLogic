@@ -33,13 +33,9 @@ public class Boat{
 			e.printStackTrace();
 		}
 
-
 		behavior.applyBehavior(this);
-
-		if(behavior.needsToChange()){
-			behavior = behavior.newBehavior();
-		}
-
+		behavior = behavior.nextBehavior();
+	
 		this.updateRudder(rudderPosition);
 		this.updateSail(sailTension);
 
