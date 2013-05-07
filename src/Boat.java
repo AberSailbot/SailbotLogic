@@ -55,19 +55,20 @@ public class Boat{
 		com.sendRequest("get wind_dir");
 		windDirection = Integer.parseInt(com.readMessage());
 
-		com.sendRequest("get waypointdir");
-		waypointHeading = Integer.parseInt(com.readMessage());
+		//com.sendRequest("get waypointdir");
+		//waypointHeading = Integer.parseInt(com.readMessage());
+		waypointHeading = 35;
+		
+		//com.sendRequest("get3556 waypointnum");
+		//int wayPointNumber = Integer.parseInt(com.readMessage());
 
-		com.sendRequest("get waypointnum");
-		int wayPointNumber = Integer.parseInt(com.readMessage());
-
-		com.sendRequest("get waypointnorthing " + wayPointNumber);
+		//com.sendRequest("get waypointnorthing " + wayPointNumber);
 		nextWayPoint
-				.setLatitude(Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100);
+				.setLatitude(Double.parseDouble("52.892335"));
 
-		com.sendRequest("get waypointeasting " + wayPointNumber);
+		//com.sendRequest("get waypointeasting " + wayPointNumber);
 		nextWayPoint
-				.setLongitude(Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100);
+				.setLongitude(Double.parseDouble("-4.101105"));
 
 		com.sendRequest("get easting");
 		double easting = Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100;
