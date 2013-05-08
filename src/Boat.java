@@ -93,7 +93,6 @@ public class Boat{
 	public void updateSail(int tension){
 
 		this.sailTension = tension;
-
 		try{
 			com.sendMessage("set sail " + sailTension);
 		}catch(IOException e){

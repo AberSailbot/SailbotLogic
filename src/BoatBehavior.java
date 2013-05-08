@@ -17,17 +17,17 @@ public abstract class BoatBehavior{
 		
 		// Shamelessly stolen from Colin (for now) (yeah, for now lol)
 		if(windDirection < 180){
-			if(windDirection < 70) 			sailPosition = 0;
+			if(windDirection < 70)		sailPosition = 0;
 			else if(windDirection < 80) 	sailPosition = 18;
-			else if(windDirection < 90)		sailPosition = 36;
+			else if(windDirection < 90)	sailPosition = 36;
 			else if(windDirection < 110)	sailPosition = 54;
-			else							sailPosition = 72;
+			else				sailPosition = 72;
 		}else{
-			if(windDirection >= 290)		sailPosition = 0;
+			if(windDirection >= 290)	sailPosition = 0;
 			else if(windDirection >= 280)	sailPosition = 342;
 			else if(windDirection >= 270)	sailPosition = 324;
 			else if(windDirection >= 250)	sailPosition = 306;
-			else							sailPosition = 288;
+			else		 		sailPosition = 288;
 		}
 		System.out.println("I am setting the sail to " + sailPosition + '\n');
 	}
