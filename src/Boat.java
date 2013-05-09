@@ -9,11 +9,11 @@ public class Boat{
 	public BoatBehavior behavior;
 	public Communication com;
 
-	private Position position;
+	//private Position position;
 	private int heading;
 	private int windDirection;
 	private int waypointHeading;
-	private Position nextWayPoint;
+	//private Position nextWayPoint;
 
 	private int sailTension;
 	private int rudderPosition;
@@ -21,8 +21,8 @@ public class Boat{
 	public Boat(){
 		behavior = new PIDBehavior();
 		com = new Communication();
-		position = new Position();
-		nextWayPoint = new Position();
+		//position = new Position();
+		//nextWayPoint = new Position();
 	}
 
 	public void update(){
@@ -55,28 +55,26 @@ public class Boat{
 		com.sendRequest("get wind_dir");
 		windDirection = Integer.parseInt(com.readMessage());
 
-		//com.sendRequest("get waypointdir");
-		//waypointHeading = Integer.parseInt(com.readMessage());
-		waypointHeading = 35;
+		com.sendRequest("get waypointdir");
+		waypointHeading = Integer.parseInt(com.readMessage());
+		//waypointHeading = 35;
 		
 		//com.sendRequest("get3556 waypointnum");
 		//int wayPointNumber = Integer.parseInt(com.readMessage());
 
-		//com.sendRequest("get waypointnorthing " + wayPointNumber);
-		nextWayPoint
-				.setLatitude(Double.parseDouble("52.892335"));
+		/*com.sendRequest("get waypointnorthing " + wayPointNumber);
+		nextWayPoint.setLatitude(Double.parseDouble("52.892335"));
 
 		//com.sendRequest("get waypointeasting " + wayPointNumber);
-		nextWayPoint
-				.setLongitude(Double.parseDouble("-4.101105"));
+		nextWayPoint.setLongitude(Double.parseDouble("-4.101105"));*/
 
-		com.sendRequest("get easting");
+		/*com.sendRequest("get easting");
 		double easting = Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100;
 
 		com.sendRequest("get northing");
 		double northing = Double.parseDouble(com.readMessage()) / 10000000 * 10 + 100;
 
-		position.set(easting, northing);
+		position.set(easting, northing);*/
 	}
 
 	public void updateRudder(int position){
@@ -100,13 +98,13 @@ public class Boat{
 		}
 	}
 
-	public Position getPosition(){
+/*	public Position getPosition(){
 		return position;
 	}
 
 	public void setPosition(Position position){
 		this.position = position;
-	}
+	}*/
 
 	public int getHeading(){
 		return heading;
@@ -128,15 +126,11 @@ public class Boat{
 		return waypointHeading;
 	}
 
-	public void setWaypointHeading(int waypointHeading){
-		this.waypointHeading = waypointHeading;
-	}
-
-	public Position getNextWayPoint(){
+	/*public Position getNextWayPoint(){
 		return nextWayPoint;
 	}
 
 	public void setNextWayPoint(Position nextWayPoint){
 		this.nextWayPoint = nextWayPoint;
-	}
+	}*/
 }
