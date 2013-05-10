@@ -16,9 +16,17 @@ public class Boat{
 	private int sailTension;
 	private int rudderPosition;
 
+
+
+    private Position position;
+    private Position nextWayPoint;
+
 	public Boat(){
 		behavior = new PIDBehavior(this);
 		com = new Communication();
+
+        position = new Position ();
+        nextWayPoint = new Position ();
 	}
 
 	public void update(){
@@ -51,6 +59,27 @@ public class Boat{
 
 		com.sendRequest("get waypointdir");
 		waypointHeading = Integer.parseInt(com.readMessage());
+
+        /////////////////////////
+
+        com.sendMessage ( "get waypointnum" );
+        int wayPointNumber = Integer.parseInt ( com.readMessage () );
+
+        com.sendMessage ( "get waypointnorthing " + wayPointNumber );
+        nextWayPoint.setLatitude ( Math.abs ( Double.parseDouble ( com.readMessage () )  ) );
+
+        com.sendMessage ( "get waypointeasting " + wayPointNumber );
+        nextWayPoint.setLongitude ( Double.parseDouble ( com.readMessage () ) );
+
+        ///////////////////
+
+        com.sendMessage ( "get easting" );
+        double easting  = Double.parseDouble ( com.readMessage ());
+
+        com.sendMessage ( "get northing" );
+        double northing  = Math.abs(Double.parseDouble ( com.readMessage ()));
+
+        position.set ( easting, northing );
 	}
 
 	public void updateRudder(int position){
@@ -82,4 +111,14 @@ public class Boat{
 	public int getWaypointHeading(){
 		return waypointHeading;
 	}
+
+    public Position getPosition ()
+    {
+        return position;
+    }
+
+    public Position getNextWayPoint ()
+    {
+        return nextWayPoint;
+    }
 }

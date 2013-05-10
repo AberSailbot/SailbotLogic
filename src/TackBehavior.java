@@ -5,12 +5,20 @@ import java.io.IOException;
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
  * @version 1.0 (4 May 2013)
  */
+
+
+import static java.lang.Math.*;
+
 public class TackBehavior extends BoatBehavior{
 
+    private Position startPoint;
+    private Position target;
 
     TackBehavior(Boat boat)
     {
         super(boat);
+        startPoint = boat.getPosition ();
+        target = boat.getNextWayPoint ();
     }
 
 	@Override
@@ -90,5 +98,10 @@ public class TackBehavior extends BoatBehavior{
 		}else return this;
 		
 	}
+
+    public double crossTrackError()
+    {
+         return asin ( sin ( Position.getDistanceBetween ( startPoint, target ) ) * sin ( Position.getHeadingBetween ( startPoint, boat.getPosition () ) - Position.getHeadingBetween ( startPoint, target ) ) ) ;
+    }
 
 }

@@ -1,3 +1,5 @@
+import static java.lang.Math.*;
+
 /**
  * @author thip
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
@@ -18,6 +20,12 @@ public class Position{
 
 		return hdg;
 	}
+
+    public static double getDistanceBetween(Position a, Position b)
+    {
+        return 2*asin( sqrt ( pow(( sin ( ( a.getLatitude () - b.getLatitude () ) / 2 ) ), 2) +
+                 cos ( a.getLatitude () ) * cos ( b.getLatitude () ) * pow (( sin ( ( a.getLongitude () - b.getLongitude () ) / 2 ) ) ,2) ) );
+    }
 
 	public double getLongitude(){
 		return longitude;
