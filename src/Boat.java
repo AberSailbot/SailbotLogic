@@ -17,7 +17,7 @@ public class Boat{
 	private int rudderPosition;
 
 	public Boat(){
-		behavior = new PIDBehavior();
+		behavior = new PIDBehavior(this);
 		com = new Communication();
 	}
 
@@ -28,7 +28,7 @@ public class Boat{
 			e.printStackTrace();
 		}
 
-		behavior.applyBehavior(this);
+		behavior.applyBehavior();
 		behavior = behavior.nextBehavior();
 	
 		this.updateRudder(rudderPosition);

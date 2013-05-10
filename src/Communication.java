@@ -14,7 +14,7 @@ public class Communication{
 
 	public Communication(){
 		try{
-			socket = new Socket("localhost", 10006);
+			socket = new Socket("localhost", 5555);//10006);
 			transmit = new PrintWriter(socket.getOutputStream(), true);
 			receive = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
@@ -29,7 +29,7 @@ public class Communication{
 	}
 
 	public String readMessage() throws IOException{
-		System.out.print("Received message : ");	
+		//System.out.print("Received message : ");
 		String message = "";
 		char[] messageByte = new char[1];
 		receive.read(messageByte);
@@ -40,7 +40,7 @@ public class Communication{
 			message = message + messageByte[0];
 			receive.read(messageByte);
 		}
-		System.out.println(message);
+		//System.out.println(message);
 		return message;
 
 	}

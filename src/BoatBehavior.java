@@ -5,13 +5,28 @@
  */
 public abstract class BoatBehavior{
 	
-	protected int windDirection;
+	protected Boat boat;
+
+    protected int windDirection;
 	protected int heading;
 	protected int desiredHeading;
 	protected int sailPosition;
+
 	
-	abstract void applyBehavior(Boat boat);
+	abstract void applyBehavior();
 	abstract BoatBehavior nextBehavior();
+
+    BoatBehavior(Boat boat)
+    {
+        this.boat = boat;
+    }
+
+    protected int windDirectionRelativeToWorld()
+    {
+        return heading + getHeadingDifference ( boat.getWindDirection (), 0);
+
+
+    }
 	
 	protected void setSail(){
 		

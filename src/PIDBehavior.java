@@ -7,8 +7,13 @@ public class PIDBehavior extends BoatBehavior{
 
 	double rudder;
 
+    PIDBehavior(Boat boat)
+    {
+        super(boat);
+    }
+
 	@Override
-	public void applyBehavior(Boat boat){
+	public void applyBehavior(){
 		windDirection = boat.getWindDirection();
 		heading = boat.getHeading();
 		desiredHeading = boat.getWaypointHeading();
@@ -24,8 +29,9 @@ public class PIDBehavior extends BoatBehavior{
 
 	@Override
 	public BoatBehavior nextBehavior(){
-		if(45 > Math.abs(getHeadingDifference(desiredHeading, 270)))
-			return new TackBehavior();
+        windDirectionRelativeToWorld ();
+		if(45 > Math.abs(getHeadingDifference(desiredHeading, windDirectionRelativeToWorld ())))
+			return new TackBehavior(boat);
 		else return this;
 	}
 

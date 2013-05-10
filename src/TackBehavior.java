@@ -7,8 +7,14 @@ import java.io.IOException;
  */
 public class TackBehavior extends BoatBehavior{
 
+
+    TackBehavior(Boat boat)
+    {
+        super(boat);
+    }
+
 	@Override
-	public void applyBehavior(Boat boat){
+	public void applyBehavior(){
 		windDirection = boat.getWindDirection();
 		desiredHeading = boat.getWaypointHeading();
 		heading = boat.getHeading();
@@ -78,9 +84,9 @@ public class TackBehavior extends BoatBehavior{
 
 	@Override
 	public BoatBehavior nextBehavior(){
-		if(45 < Math.abs(getHeadingDifference(desiredHeading, 270))){
+		if(45 < Math.abs(getHeadingDifference(desiredHeading, windDirectionRelativeToWorld ()))){
 			System.out.println("leaving tack");
-			return new PIDBehavior(); 
+			return new PIDBehavior(boat);
 		}else return this;
 		
 	}
