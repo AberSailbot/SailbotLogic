@@ -6,7 +6,9 @@ import java.io.IOException;
  * @version 1.0 (4 May 2013)
  */
 public class Boat{
-	public BoatBehavior behavior;
+	
+	private BoatBehavior behavior;
+	public Waypoints waypoints;
 	public Communication com;
 
 	private int heading;
@@ -22,6 +24,7 @@ public class Boat{
     private Position nextWayPoint;
 
 	public Boat(){
+		waypoints = new Waypoints();
 		behavior = new PIDBehavior(this);
 		com = new Communication();
 
@@ -62,24 +65,25 @@ public class Boat{
 
         /////////////////////////
 
-        com.sendMessage ( "get waypointnum" );
-        int wayPointNumber = Integer.parseInt ( com.readMessage () );
+		com.sendMessage("get waypointnum");
+		int wayPointNumber = Integer.parseInt(com.readMessage());
 
-        com.sendMessage ( "get waypointnorthing " + wayPointNumber );
-        nextWayPoint.setLatitude ( Math.abs ( Double.parseDouble ( com.readMessage () )  ) );
+		com.sendMessage("get waypointnorthing " + wayPointNumber);
+		nextWayPoint
+				.setLat(Math.abs(Double.parseDouble(com.readMessage())));
 
-        com.sendMessage ( "get waypointeasting " + wayPointNumber );
-        nextWayPoint.setLongitude ( Double.parseDouble ( com.readMessage () ) );
+		com.sendMessage("get waypointeasting " + wayPointNumber);
+		nextWayPoint.setLon(Double.parseDouble(com.readMessage()));
 
         ///////////////////
 
-        com.sendMessage ( "get easting" );
-        double easting  = Double.parseDouble ( com.readMessage ());
+		com.sendMessage("get easting");
+		double easting = Double.parseDouble(com.readMessage());
 
-        com.sendMessage ( "get northing" );
-        double northing  = Math.abs(Double.parseDouble ( com.readMessage ()));
+		com.sendMessage("get northing");
+		double northing = Math.abs(Double.parseDouble(com.readMessage()));
 
-        position.set ( easting, northing );
+		position.set(easting, northing);
 	}
 
 	public void updateRudder(int position){

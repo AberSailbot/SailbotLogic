@@ -18,42 +18,12 @@ import java.util.LinkedList;
  */
 public class Waypoints{
 	
-	/**
-	 * Represents a GPS coordinate.
-	 * @author Kamil Mrowiec <kam20@aber.ac.uk>
-	 * @version 1.0 (20 May 2013)
-	 */
-	public class Coordinate{
-		Double lat, lon;
-		
-		public Coordinate(double lat, double lon){
-			this.lat = lat;
-			this.lon = lon;
-		}
-
-		public Double getLat(){
-			return lat;
-		}
-
-		public void setLat(Double lat){
-			this.lat = lat;
-		}
-
-		public Double getLon(){
-			return lon;
-		}
-
-		public void setLon(Double lon){
-			this.lon = lon;
-		}
-		
-	}
+	public static final int WP_REACHED_THRESHOLD = 5;
 	
-	
-	LinkedList<Coordinate> points = new LinkedList<Coordinate>();
+	LinkedList<Position> points = new LinkedList<Position>();
 	int nextWaypointNumber = 0;
 	
-	public Coordinate getNextWaypoint(){
+	public Position getNextWaypoint(){
 		if(points.size() <= nextWaypointNumber || nextWaypointNumber<0) 
 			nextWaypointNumber = 0;
 		return points.get(nextWaypointNumber);
@@ -69,11 +39,11 @@ public class Waypoints{
 		}
 	}
 
-	public LinkedList<Coordinate> getPoints(){
+	public LinkedList<Position> getPoints(){
 		return points;
 	}
 
-	public void setPoints(LinkedList<Coordinate> points){
+	public void setPoints(LinkedList<Position> points){
 		this.points = points;
 	}
 	
@@ -95,7 +65,7 @@ public class Waypoints{
 			String line;
 			while((line = reader.readLine())!=null){
 				String[] latlon = line.split(";");
-				this.points.add(new Coordinate(new Double(latlon[0]), new Double(latlon[1])));
+				this.points.add(new Position(new Double(latlon[0]), new Double(latlon[1])));
 			}
 			reader.close();
 		}catch(Exception ex){
@@ -111,7 +81,7 @@ public class Waypoints{
 
 			StringBuffer sb = new StringBuffer();
 			
-			for(Coordinate c : this.points){
+			for(Position c : this.points){
 				sb.append(c.getLat())
 				.append(';').append(c.getLon()).append('\n');
 			}
