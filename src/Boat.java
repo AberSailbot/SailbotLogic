@@ -18,23 +18,25 @@ public class Boat{
 	private int sailTension;
 	private int rudderPosition;
 
-
-
     private Position position;
     private Position nextWayPoint;
 
-	public Boat(){
-		waypoints = new Waypoints();
+	public Boat(Waypoints wps){
+		waypoints = wps;
 		behavior = new PIDBehavior(this);
 		com = new Communication();
 
         position = new Position ();
-        nextWayPoint = new Position ();
 	}
 
 	public void update(){
 		try{
+			//Get sensors reading from Python controller
 			readSensors();
+			
+			//Check if waypoint is reached, if so, go to next one.
+			if(waypoints.waypointReached(this.position)) waypoints.moveToNext();
+			
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -54,29 +56,8 @@ public class Boat{
 	}
 
 	public void readSensors() throws IOException{
-		com.sendRequest("get compass");
-		heading = Integer.parseInt(com.readMessage());
-
-		com.sendRequest("get wind_dir");
-		windDirection = Integer.parseInt(com.readMessage());
-
-		com.sendRequest("get waypointdir");
-		waypointHeading = Integer.parseInt(com.readMessage());
-
-        /////////////////////////
-
-		com.sendMessage("get waypointnum");
-		int wayPointNumber = Integer.parseInt(com.readMessage());
-
-		com.sendMessage("get waypointnorthing " + wayPointNumber);
-		nextWayPoint
-				.setLat(Math.abs(Double.parseDouble(com.readMessage())));
-
-		com.sendMessage("get waypointeasting " + wayPointNumber);
-		nextWayPoint.setLon(Double.parseDouble(com.readMessage()));
-
-        ///////////////////
-
+		
+		// Getting GPS location
 		com.sendMessage("get easting");
 		double easting = Double.parseDouble(com.readMessage());
 
@@ -84,6 +65,33 @@ public class Boat{
 		double northing = Math.abs(Double.parseDouble(com.readMessage()));
 
 		position.set(easting, northing);
+		
+		//Getting compass and wind sensors readings
+		com.sendRequest("get compass");
+		heading = Integer.parseInt(com.readMessage());
+
+		com.sendRequest("get wind_dir");
+		windDirection = Integer.parseInt(com.readMessage());
+
+        /////////////////////////
+		//On real boat those will be calculated here, not received from the Python code.		
+		
+//		com.sendRequest("get waypointdir");
+//		waypointHeading = Integer.parseInt(com.readMessage());
+//
+//		com.sendMessage("get waypointnum");
+//		int wayPointNumber = Integer.parseInt(com.readMessage());
+//
+//		com.sendMessage("get waypointnorthing " + wayPointNumber);
+//		nextWayPoint
+//				.setLat(Math.abs(Double.parseDouble(com.readMessage())));
+//
+//		com.sendMessage("get waypointeasting " + wayPointNumber);
+//		nextWayPoint.setLon(Double.parseDouble(com.readMessage()));
+
+        ///////////////////
+
+		
 	}
 
 	public void updateRudder(int position){
@@ -113,7 +121,7 @@ public class Boat{
 	}
 
 	public int getWaypointHeading(){
-		return waypointHeading;
+		return (int) Position.getHeading(position, nextWayPoint);
 	}
 
     public Position getPosition ()
@@ -123,6 +131,6 @@ public class Boat{
 
     public Position getNextWayPoint ()
     {
-        return nextWayPoint;
+        return waypoints.getNextWaypoint();
     }
 }

@@ -6,8 +6,10 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
@@ -28,7 +30,11 @@ public class Waypoints{
 			nextWaypointNumber = 0;
 		return points.get(nextWaypointNumber);
 	}
-
+	
+	public boolean waypointReached(Position currentPosition){
+		return Position.getDistance(currentPosition, getNextWaypoint()) < WP_REACHED_THRESHOLD;
+	}
+	
 	public boolean moveToNext(){
 		if(points.size() < nextWaypointNumber+1){
 			nextWaypointNumber++;
@@ -59,8 +65,8 @@ public class Waypoints{
 		return s;
 	}
 	
-	public void readFromFile(File file){
-		try{
+	public void readFromFile(File file) throws FileNotFoundException, IOException{
+		
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String line;
 			while((line = reader.readLine())!=null){
@@ -68,9 +74,6 @@ public class Waypoints{
 				this.points.add(new Position(new Double(latlon[0]), new Double(latlon[1])));
 			}
 			reader.close();
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
 	}
 	
 	
