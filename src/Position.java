@@ -40,8 +40,9 @@ public class Position{
     
     /**
      * Returns distance between two GPS coordinates, in meters.
-     * @param a Point one
-     * @param b Point two
+     * 
+     * @param a Location one
+     * @param b Location two
      * @return distance in meters
      * 
      * @see http://androidsnippets.com/distance-between-two-gps-coordinates-in-meter
@@ -59,6 +60,26 @@ public class Position{
     	    double tt = Math.acos(t1 + t2 + t3);
     	    return 6366000*tt;
     }
+    
+    /**
+     * Returns heading between two GPS coordinates, from a to b, in degrees.
+     * @param a Location a
+     * @param b Location b
+     * @return heading from a, to b in degrees
+     * 
+     * @see http://stackoverflow.com/questions/9457988/bearing-from-one-coordinate-to-another
+     * @author Kamil Mrowiec <kam20@aber.ac.uk>
+     */
+	public static double getHeading(Position a, Position b){
+		double lat1 = Math.toRadians(a.getLat());
+		double lat2 = Math.toRadians(b.getLat());
+		double longDiff = Math.toRadians(b.getLon() - a.getLon());
+		double y = Math.sin(longDiff) * Math.cos(lat2);
+		double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+				* Math.cos(lat2) * Math.cos(longDiff);
+		return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+	}
+    
 
 	public double getLon(){
 		return lon;

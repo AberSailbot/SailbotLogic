@@ -7,10 +7,11 @@ public class Test{
 
 	public static void main(String[] args){
 
-//		Position a = new Position(52.41633956952963,-4.0880995988845825);
-//		Position b = new Position(52.416195607387614,-4.087933301925659);
-//		System.out.println("Distance : " + Position.getDistance(a, b));
-//		System.out.println("Distance (earlier) : " + Position.getDistanceBetween(a, b));
+		Position a = new Position(52.41279272900908,-4.093136787414551);
+		Position b = new Position(52.41279272900908,-4.093501567840576);
+		System.out.println("Distance : " + Position.getDistance(a, b));
+		System.out.println("Distance (earlier) : " + Position.getDistanceBetween(a, b));
+		System.out.println("Heading : " +Position.getHeading(a, b) );
 		
 //		Boat boat = new Boat();
 //
