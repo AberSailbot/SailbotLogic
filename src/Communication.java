@@ -35,12 +35,12 @@ public class Communication{
 		receive.read(messageByte);
 
 		
-		while(messageByte[0] != '\u0000' && messageByte[0] !='$' ){
+		while(messageByte[0] != '\u0000'){
 			
 			message = message + messageByte[0];
 			receive.read(messageByte);
 		}
-		//System.out.println(message);
+		System.out.println(message);
 		return message;
 
 	}
