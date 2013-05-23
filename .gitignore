@@ -1,1 +1,4 @@
 *.swap
+*.class
+*.swp
+bin
