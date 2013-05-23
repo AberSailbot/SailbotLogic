@@ -39,7 +39,7 @@ public class TackBehavior extends BoatBehavior{
 			boat.updateRudder(90);
 			boat.updateSail(sailPosition);
 			
-			System.out.println("R");
+			System.out.print("R");
 			try{
 				boat.readSensors();
 			}catch(IOException e){
@@ -52,7 +52,7 @@ public class TackBehavior extends BoatBehavior{
 		}
 
 		setSail();
-		boat.updateRudder(0); //TODO Zero? 
+		boat.updateRudder(180); //I believe it should be 180, not zero
 		boat.updateSail(sailPosition);
 		try{
 			Thread.sleep(1000);
@@ -61,7 +61,7 @@ public class TackBehavior extends BoatBehavior{
 									// Settings | File Templates.
 		}
 
-		System.out.println("change tack");
+		System.out.print("change tack");
 
 		while(5 < Math.abs(getHeadingDifference(heading, desiredHeading - 45))){
 			setSail();
@@ -84,7 +84,7 @@ public class TackBehavior extends BoatBehavior{
 		}
 
 		setSail();
-		boat.updateRudder(0);
+		boat.updateRudder(180);
 		boat.updateSail(sailPosition);
 		try{
 			Thread.sleep(1000);
