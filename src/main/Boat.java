@@ -1,4 +1,7 @@
+package main;
+
 import java.io.IOException;
+import behavior.*;
 
 /**
  * @author thip
@@ -121,7 +124,7 @@ public class Boat{
 	}
 
 	public int getWaypointHeading(){
-		return (int) Position.getHeading(position, nextWayPoint);
+		return (int) Position.getHeading(position, waypoints.getNextWaypoint());
 	}
 
     public Position getPosition ()
