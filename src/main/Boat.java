@@ -24,6 +24,9 @@ public class Boat{
     private Position position;
     private Position nextWayPoint;
 
+    /**
+     * Creates boat with given waypoints.
+     */
 	public Boat(Waypoints wps){
 		waypoints = wps;
 		behavior = new PIDBehavior(this);
@@ -32,21 +35,36 @@ public class Boat{
         position = new Position ();
 	}
 
+	/**
+	 * Creates boat with no waypoints.
+	 */
+	public Boat(){
+		waypoints = new Waypoints();
+		behavior = new PIDBehavior(this);
+		com = new Communication();
+
+        position = new Position ();
+	}
+
 	public void update(){
+		if(waypoints.isEmpty()){
+			System.out.println("No waypoints to go to.");
+			return;
+		}
 		try{
 			//Get sensors reading from Python controller
 			readSensors();
-			
+
 			//Check if waypoint is reached, if so, go to next one.
 			if(waypoints.waypointReached(this.position)) waypoints.moveToNext();
-			
+
 		}catch(IOException e){
 			e.printStackTrace();
 		}
 
 		behavior.applyBehavior();
 		behavior = behavior.nextBehavior();
-	
+
 		this.updateRudder(rudderPosition);
 		this.updateSail(sailTension);
 
@@ -76,25 +94,6 @@ public class Boat{
 		com.sendMessage("get wind_dir");
 		windDirection = Integer.parseInt(com.readMessage());
 
-        /////////////////////////
-		//On real boat those will be calculated here, not received from the Python code.		
-		
-//		com.sendRequest("get waypointdir");
-//		waypointHeading = Integer.parseInt(com.readMessage());
-//
-//		com.sendMessage("get waypointnum");
-//		int wayPointNumber = Integer.parseInt(com.readMessage());
-//
-//		com.sendMessage("get waypointnorthing " + wayPointNumber);
-//		nextWayPoint
-//				.setLat(Math.abs(Double.parseDouble(com.readMessage())));
-//
-//		com.sendMessage("get waypointeasting " + wayPointNumber);
-//		nextWayPoint.setLon(Double.parseDouble(com.readMessage()));
-
-        ///////////////////
-
-		
 	}
 
 	public void updateRudder(int position){
