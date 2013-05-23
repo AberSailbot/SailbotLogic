@@ -1,8 +1,4 @@
-package main;
 import java.io.IOException;
-
-import behavior.BoatBehavior;
-import behavior.PIDBehavior;
 
 /**
  * @author thip
@@ -25,9 +21,6 @@ public class Boat{
     private Position position;
     private Position nextWayPoint;
 
-    /**
-     * Creates boat with given waypoints.
-     */
 	public Boat(Waypoints wps){
 		waypoints = wps;
 		behavior = new PIDBehavior(this);
@@ -35,23 +28,8 @@ public class Boat{
 
         position = new Position ();
 	}
-	
-	/**
-	 * Creates boat with no waypoints.
-	 */
-	public Boat(){
-		waypoints = new Waypoints();
-		behavior = new PIDBehavior(this);
-		com = new Communication();
-
-        position = new Position ();
-	}
 
 	public void update(){
-		if(waypoints.isEmpty()){
-			System.out.println("No waypoints to go to.");
-			return;
-		}
 		try{
 			//Get sensors reading from Python controller
 			readSensors();
@@ -82,17 +60,17 @@ public class Boat{
 		// Getting GPS location
 		com.sendMessage("get easting");
 		double easting = Double.parseDouble(com.readMessage());
-
+		
 		com.sendMessage("get northing");
 		double northing = Math.abs(Double.parseDouble(com.readMessage()));
 
 		position.set(easting, northing);
 		
 		//Getting compass and wind sensors readings
-		com.sendRequest("get compass");
+		com.sendMessage("get compass");
 		heading = Integer.parseInt(com.readMessage());
 
-		com.sendRequest("get wind_dir");
+		com.sendMessage("get wind_dir");
 		windDirection = Integer.parseInt(com.readMessage());
 
         /////////////////////////

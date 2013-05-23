@@ -1,4 +1,3 @@
-package main;
 import java.io.*;
 import java.net.*;
 
@@ -15,7 +14,7 @@ public class Communication{
 
 	public Communication(){
 		try{
-			socket = new Socket("localhost", 5555);//10006);
+			socket = new Socket("localhost", 10006); //10006);
 			transmit = new PrintWriter(socket.getOutputStream(), true);
 			receive = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
@@ -25,25 +24,16 @@ public class Communication{
 		}
 	}
 
-	public void sendRequest(String message) throws IOException{
+	public void sendMessage(String message) throws IOException{
 		transmit.println(message);
+		transmit.flush();
 	}
 
 	public String readMessage() throws IOException{
-		//System.out.print("Received message : ");
-		String message = "";
-		char[] messageByte = new char[1];
-		receive.read(messageByte);
-
-		
-		while(messageByte[0] != '\u0000' && messageByte[0] !='$' ){
-			
-			message = message + messageByte[0];
-			receive.read(messageByte);
-		}
-		//System.out.println(message);
+		System.out.print("Received message : ");
+		String message = receive.readLine();
+		System.out.println(message);
 		return message;
-
 	}
 
 	public void clean(){
@@ -57,8 +47,4 @@ public class Communication{
 		return socket.isConnected();
 	}
 
-	public void sendMessage(String s) throws IOException{
-		sendRequest(s);
-		readMessage(); // clears the buffer;
-	}
 }
