@@ -16,10 +16,12 @@ public class Boat{
 
 	private int heading;
 	private int windDirection; // Relative to the boat!
-	private Position currentPosition;
+	private Position position;
+	private double distanceToWaypoint;
 	
 	private int sailTension;
 	private int rudderPosition;
+	
 
     
 
@@ -31,7 +33,7 @@ public class Boat{
 		behavior = new PIDBehavior(this);
 		com = new Communication();
 
-        currentPosition = new Position ();
+        position = new Position ();
         
         try{
         	//Informing the Python program that waypoint has changed.
@@ -47,11 +49,11 @@ public class Boat{
 	 * Creates boat with no waypoints.
 	 */
 	public Boat(){
-		waypoints = new Waypoints();
+		waypoints = new Waypoints(this);
 		behavior = new PIDBehavior(this);
 		com = new Communication();
 
-        currentPosition = new Position ();
+        position = new Position ();
 	}
 
 	public void update(){
@@ -62,10 +64,16 @@ public class Boat{
 		try{
 			//Get sensors reading from Python controller
 			readSensors();
-
+			
+			//Reading distance to waypoint and sending it to the Python program
+			distanceToWaypoint = waypoints.getDistanceToWaypoint();
+			com.sendMessage("set waypointdistance " + distanceToWaypoint);
+			
 			//Check if waypoint is reached, if so, go to next one.
-			if(waypoints.waypointReached(this.currentPosition)){
+			if(distanceToWaypoint < Waypoints.WP_REACHED_THRESHOLD){
+				System.out.println("Waypoint " + waypoints.getNextWaypointNumber() + " reached, moving to next one");
 				waypoints.moveToNext();
+				
 				//Informing the Python program that waypoint has changed.
 				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
 				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
@@ -99,7 +107,7 @@ public class Boat{
 		com.sendMessage("get northing");
 		double northing = Math.abs(Double.parseDouble(com.readMessage()));
 
-		currentPosition.set(easting, northing);
+		position.set(easting, northing);
 		
 		//Getting compass and wind sensors readings
 		com.sendMessage("get compass");
@@ -140,12 +148,12 @@ public class Boat{
 	}
 
 	public int getWaypointHeading(){
-		return (int) Position.getHeading(currentPosition, waypoints.getNextWaypoint());
+		return (int) Position.getHeading(position, waypoints.getNextWaypoint());
 	}
 
     public Position getPosition ()
     {
-        return currentPosition;
+        return position;
     }
 
     public Position getNextWayPoint ()

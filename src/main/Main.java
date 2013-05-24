@@ -19,7 +19,7 @@ public class Main{
 		}else waypointsFile = args[0];
 		
 		File wpFile = new File(waypointsFile);
-		Waypoints wps = new Waypoints();
+		Waypoints wps = new Waypoints(null);
 		
 		try{
 			wps.readFromFile(wpFile);
@@ -33,6 +33,7 @@ public class Main{
 		}
 		
 		Boat boat = new Boat(wps);
+		wps.setBoat(boat);
 
 		for(;;){
 			try{

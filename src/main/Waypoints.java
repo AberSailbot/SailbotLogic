@@ -21,10 +21,19 @@ import java.util.LinkedList;
  */
 public class Waypoints{
 	
-	public static final int WP_REACHED_THRESHOLD = 100;
+	/**
+	 * Defines how close the boat needs to get to a waypoint.
+	 */
+	public static final int WP_REACHED_THRESHOLD = 10;
+	
+	Boat boat;
 	
 	LinkedList<Position> points = new LinkedList<Position>();
 	int nextWaypointNumber = 0;
+	
+	public Waypoints(Boat boat){
+		this.boat = boat;
+	}
 	
 	public Position getNextWaypoint(){
 		if(points.size() <= nextWaypointNumber || nextWaypointNumber<0) 
@@ -32,11 +41,8 @@ public class Waypoints{
 		return points.get(nextWaypointNumber);
 	}
 	
-	public boolean waypointReached(Position currentPosition){
-		System.out.println("Current pos: " + currentPosition.getLat() + ", " + currentPosition.getLon());
-		double distance = Position.getDistance(currentPosition, getNextWaypoint());
-		System.out.println("Distance to waypoint: " + distance);	
-		return distance < WP_REACHED_THRESHOLD;
+	public double getDistanceToWaypoint(){
+		return Position.getDistance(boat.getPosition(), getNextWaypoint());
 	}
 	
 	public boolean moveToNext(){
@@ -111,6 +117,16 @@ public class Waypoints{
 	public boolean isEmpty(){
 		return points.isEmpty();
 	}
+
+	public Boat getBoat(){
+		return boat;
+	}
+
+	public void setBoat(Boat boat){
+		this.boat = boat;
+	}
+	
+	
 	
 	
 	

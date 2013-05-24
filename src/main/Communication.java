@@ -29,12 +29,12 @@ public class Communication{
 	public void sendMessage(String message) throws IOException{
 		transmit.println(message);
 		transmit.flush();
-		System.out.println("Sent message : " + message);
+		//System.out.println("Sent message : " + message);
 	}
 
 	public String readMessage() throws IOException{
 		String message = receive.readLine();
-		System.out.println("Received message : " + message);
+		//System.out.println("Received message : " + message);
 		return message;
 	}
 
