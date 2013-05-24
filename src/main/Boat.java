@@ -32,6 +32,15 @@ public class Boat{
 		com = new Communication();
 
         currentPosition = new Position ();
+        
+        try{
+        	//Informing the Python program that waypoint has changed.
+        	com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
+        	com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
+        	com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
+        }catch(IOException ex){
+        	ex.printStackTrace();
+        }
 	}
 
 	/**
@@ -55,7 +64,13 @@ public class Boat{
 			readSensors();
 
 			//Check if waypoint is reached, if so, go to next one.
-			if(waypoints.waypointReached(this.currentPosition)) waypoints.moveToNext();
+			if(waypoints.waypointReached(this.currentPosition)){
+				waypoints.moveToNext();
+				//Informing the Python program that waypoint has changed.
+				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
+				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
+				com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
+			}
 
 		}catch(IOException e){
 			e.printStackTrace();
