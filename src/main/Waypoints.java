@@ -33,6 +33,7 @@ public class Waypoints{
 	}
 	
 	public boolean waypointReached(Position currentPosition){
+		System.out.println("Current pos: " + currentPosition.getLat() + ", " + currentPosition.getLon());
 		double distance = Position.getDistance(currentPosition, getNextWaypoint());
 		System.out.println("Distance to waypoint: " + distance);	
 		return distance < WP_REACHED_THRESHOLD;
