@@ -9,6 +9,14 @@ import main.Boat;
 public class PIDBehavior extends BoatBehavior{
 
 	double rudder;
+	
+	double epsilon = 0.01;
+	double dt = 0.01; // 100ms loop time
+	double MAX = 90; // For Current Saturation
+	double MIN = -90;
+	double Kp = 0.1;
+	double Kd = 0.01;
+	double Ki = 0.005;
 
 	public PIDBehavior(Boat boat){
 		super(boat);
@@ -38,14 +46,6 @@ public class PIDBehavior extends BoatBehavior{
 	}
 
 	double PIDcal(int setpoint, int actual_position){
-
-		double epsilon = 0.01;
-		double dt = 0.01; // 100ms loop time
-		double MAX = 90; // For Current Saturation
-		double MIN = -90;
-		double Kp = 0.1;
-		double Kd = 0.01;
-		double Ki = 0.005;
 
 		double pre_error = 0;
 		double integral = 0;
@@ -77,7 +77,7 @@ public class PIDBehavior extends BoatBehavior{
 
 	void setRudder(){
 		rudder = PIDcal(0, getHeadingDifference(desiredHeading, heading));
-
+		rudder +=180;
 		System.out.println("I'm setting the rudder to " + rudder + '\n');
 
 		if(rudder < 0){

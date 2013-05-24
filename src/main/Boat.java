@@ -16,13 +16,12 @@ public class Boat{
 
 	private int heading;
 	private int windDirection;
-	private int waypointHeading;
-
+	private Position currentPosition;
+	
 	private int sailTension;
 	private int rudderPosition;
 
-    private Position position;
-    private Position nextWayPoint;
+    
 
     /**
      * Creates boat with given waypoints.
@@ -32,7 +31,7 @@ public class Boat{
 		behavior = new PIDBehavior(this);
 		com = new Communication();
 
-        position = new Position ();
+        currentPosition = new Position ();
 	}
 
 	/**
@@ -43,7 +42,7 @@ public class Boat{
 		behavior = new PIDBehavior(this);
 		com = new Communication();
 
-        position = new Position ();
+        currentPosition = new Position ();
 	}
 
 	public void update(){
@@ -56,7 +55,7 @@ public class Boat{
 			readSensors();
 
 			//Check if waypoint is reached, if so, go to next one.
-			if(waypoints.waypointReached(this.position)) waypoints.moveToNext();
+			if(waypoints.waypointReached(this.currentPosition)) waypoints.moveToNext();
 
 		}catch(IOException e){
 			e.printStackTrace();
@@ -85,7 +84,7 @@ public class Boat{
 		com.sendMessage("get northing");
 		double northing = Math.abs(Double.parseDouble(com.readMessage()));
 
-		position.set(easting, northing);
+		currentPosition.set(easting, northing);
 		
 		//Getting compass and wind sensors readings
 		com.sendMessage("get compass");
@@ -123,12 +122,12 @@ public class Boat{
 	}
 
 	public int getWaypointHeading(){
-		return (int) Position.getHeading(position, waypoints.getNextWaypoint());
+		return (int) Position.getHeading(currentPosition, waypoints.getNextWaypoint());
 	}
 
     public Position getPosition ()
     {
-        return position;
+        return currentPosition;
     }
 
     public Position getNextWayPoint ()
