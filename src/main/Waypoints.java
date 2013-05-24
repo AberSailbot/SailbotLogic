@@ -21,7 +21,7 @@ import java.util.LinkedList;
  */
 public class Waypoints{
 	
-	public static final int WP_REACHED_THRESHOLD = 5;
+	public static final int WP_REACHED_THRESHOLD = 100;
 	
 	LinkedList<Position> points = new LinkedList<Position>();
 	int nextWaypointNumber = 0;
@@ -33,7 +33,9 @@ public class Waypoints{
 	}
 	
 	public boolean waypointReached(Position currentPosition){
-		return Position.getDistance(currentPosition, getNextWaypoint()) < WP_REACHED_THRESHOLD;
+		double distance = Position.getDistance(currentPosition, getNextWaypoint());
+		System.out.println("Distance to waypoint: " + distance);	
+		return distance < WP_REACHED_THRESHOLD;
 	}
 	
 	public boolean moveToNext(){
