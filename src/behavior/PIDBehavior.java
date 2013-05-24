@@ -24,8 +24,8 @@ public class PIDBehavior extends BoatBehavior{
 
 	@Override
 	public void applyBehavior(){
-		windDirection = boat.getWindDirection();
 		heading = boat.getHeading();
+		windDirection = boat.getWindDirection();
 		desiredHeading = boat.getWaypointHeading();
 
 		setSail();

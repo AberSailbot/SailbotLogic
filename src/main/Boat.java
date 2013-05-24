@@ -15,7 +15,7 @@ public class Boat{
 	public Communication com;
 
 	private int heading;
-	private int windDirection;
+	private int windDirection; // Relative to the boat!
 	private Position currentPosition;
 	
 	private int sailTension;
@@ -105,8 +105,11 @@ public class Boat{
 		com.sendMessage("get compass");
 		heading = Integer.parseInt(com.readMessage());
 
+		//Python code sends absolute wind direction.
+		//This code requires wind position relative to the boat,
+		//so it needs to be converted here.
 		com.sendMessage("get wind_dir");
-		windDirection = Integer.parseInt(com.readMessage());
+		windDirection = Integer.parseInt(com.readMessage()) - heading;
 
 	}
 
