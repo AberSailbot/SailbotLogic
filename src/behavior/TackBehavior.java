@@ -15,7 +15,7 @@ import main.Position;
 import static java.lang.Math.*;
 
 public class TackBehavior extends BoatBehavior{
-
+/*
     private Position startPoint;
     private Position target;
 
@@ -108,5 +108,5 @@ public class TackBehavior extends BoatBehavior{
     {
          return asin ( sin ( Position.getDistanceBetween ( startPoint, target ) ) * sin ( Position.getHeadingBetween ( startPoint, boat.getPosition () ) - Position.getHeadingBetween ( startPoint, target ) ) ) ;
     }
-
+*/
 }

@@ -15,11 +15,12 @@ public class Boat{
 	public Communication com;
 
 	private int heading;
-	private int windDirection; // Relative to the boat!
 	private Position position;
-	private double distanceToWaypoint;
+	private int absoluteWindDirection; 
 	
-	private int sailTension;
+	private double distanceToWaypoint;
+	private int waypointHeading;
+	
 	private int rudderPosition;
 	
 
@@ -35,14 +36,10 @@ public class Boat{
 
         position = new Position ();
         
-        try{
-        	//Informing the Python program that waypoint has changed.
-        	com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
-        	com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
-        	com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
-        }catch(IOException ex){
-        	ex.printStackTrace();
-        }
+        //Informing the Python program that waypoint has changed.
+		com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
+		com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
+		com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
 	}
 
 	/**
@@ -56,46 +53,55 @@ public class Boat{
         position = new Position ();
 	}
 
-	public void update(){
+	public void sail(){
 		if(waypoints.isEmpty()){
 			System.out.println("No waypoints to go to.");
 			return;
 		}
-		try{
+		
+		while(true){
+			
+			//STEP 1:
 			//Get sensors reading from Python controller
-			readSensors();
+			try{
+				readSensors();
+			}catch(IOException ex){
+				ex.printStackTrace();
+			}
+			
+			//STEP 2:
+			//Check if waypoint is reached. If so, go to next one.
 			
 			//Reading distance to waypoint and sending it to the Python program
 			distanceToWaypoint = waypoints.getDistanceToWaypoint();
 			com.sendMessage("set waypointdistance " + distanceToWaypoint);
 			
-			//Check if waypoint is reached, if so, go to next one.
+			//Comparing the distance.
 			if(distanceToWaypoint < Waypoints.WP_REACHED_THRESHOLD){
 				System.out.println("Waypoint " + waypoints.getNextWaypointNumber() + " reached, moving to next one");
 				waypoints.moveToNext();
-				
 				//Informing the Python program that waypoint has changed.
 				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
 				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
 				com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
+			} 
+			
+			//STEP 3:
+			//If current boat heading is (almost) equal to waypoint heading,
+			//boat just continues sailing. Otherwise, course needs to be corrected.
+			if(Math.abs(Utils.getHeadingDifference(heading, waypoints.getWaypointHeading())) < 2){
+				try{
+					this.updateSail();
+					Thread.sleep(300);
+				}catch(InterruptedException e){
+					e.printStackTrace(); 
+				}
+			}else{
+				
 			}
-
-		}catch(IOException e){
-			e.printStackTrace();
+			
 		}
-
-		behavior.applyBehavior();
-		behavior = behavior.nextBehavior();
-
-		this.updateRudder(rudderPosition);
-		this.updateSail(sailTension);
-
-		try{
-			Thread.sleep(1000);
-		}catch(InterruptedException e){
-			e.printStackTrace(); // To change body of catch statement use File |
-									// Settings | File Templates.
-		}
+				
 	}
 
 	public void readSensors() throws IOException{
@@ -114,50 +120,75 @@ public class Boat{
 		heading = Integer.parseInt(com.readMessage());
 
 		//Python code sends absolute wind direction.
-		//This code requires wind position relative to the boat,
-		//so it needs to be converted here.
 		com.sendMessage("get wind_dir");
-		windDirection = Integer.parseInt(com.readMessage()) - heading;
+		absoluteWindDirection = Integer.parseInt(com.readMessage()) - heading;
 
 	}
 
+
+	/**
+	 * Tells the Python code to set rudder to given position.
+	 * 
+	 * @param position
+	 */
 	public void updateRudder(int position){
-		this.rudderPosition = position;
-		try{
 			com.sendMessage("set rudder " + rudderPosition);
-		}catch(IOException e){
-			e.printStackTrace();
+	}
+	
+	/**
+	 * Calculates how tense the sail should be and tells the Python program to set it.
+	 */
+	public void updateSail(){
+		//TODO So that sail is only updated every n seconds
+		int relativeDirection = this.getRelativeWindDirection();
+		int sailPosition; //Sail position that will be set.
+		// Shamelessly stolen from Colin (for now) (yeah, for now lol)
+		if(relativeDirection < 180){
+			if(relativeDirection < 70)
+				sailPosition = 0;
+			else if(relativeDirection < 80)
+				sailPosition = 18;
+			else if(relativeDirection < 90)
+				sailPosition = 36;
+			else if(relativeDirection < 110)
+				sailPosition = 54;
+			else
+				sailPosition = 72;
+		}else{
+			if(relativeDirection >= 290)
+				sailPosition = 0;
+			else if(relativeDirection >= 280)
+				sailPosition = 342;
+			else if(relativeDirection >= 270)
+				sailPosition = 324;
+			else if(relativeDirection >= 250)
+				sailPosition = 306;
+			else
+				sailPosition = 288;
 		}
+		System.out.println("I am setting the sail to " + sailPosition);
+		com.sendMessage("set sail " + sailPosition);
 	}
 
-	public void updateSail(int tension){
-		this.sailTension = tension;
-		try{
-			com.sendMessage("set sail " + sailTension);
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+	/**
+	 * Returns wind direction relative to the boat.
+	 * @return
+	 */
+	public int getRelativeWindDirection(){
+		int dir = this.absoluteWindDirection - this.heading;
+		if(dir < 0) dir = 360 + dir;
+		return dir; //TODO Make sure that is always correct?
 	}
-
+	
 	public int getHeading(){
 		return heading;
 	}
 
-	public int getWindDirection(){
-		return windDirection;
+	public Position getPosition(){
+		return position;
 	}
 
-	public int getWaypointHeading(){
-		return (int) Position.getHeading(position, waypoints.getNextWaypoint());
+	public Position getNextWayPoint(){
+		return waypoints.getNextWaypoint();
 	}
-
-    public Position getPosition ()
-    {
-        return position;
-    }
-
-    public Position getNextWayPoint ()
-    {
-        return waypoints.getNextWaypoint();
-    }
 }

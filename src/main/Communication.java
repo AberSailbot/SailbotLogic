@@ -26,16 +26,22 @@ public class Communication{
 		}
 	}
 
-	public void sendMessage(String message) throws IOException{
+	public void sendMessage(String message){
 		transmit.println(message);
 		transmit.flush();
 		//System.out.println("Sent message : " + message);
 	}
 
-	public String readMessage() throws IOException{
-		String message = receive.readLine();
-		//System.out.println("Received message : " + message);
-		return message;
+	public String readMessage(){
+		try{
+			String message = receive.readLine();
+			//System.out.println("Received message : " + message);
+			return message;
+		}catch(IOException ex){
+			ex.printStackTrace();
+			return "";
+		}
+		
 	}
 
 	public void clean(){

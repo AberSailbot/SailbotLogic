@@ -77,7 +77,7 @@ public class PIDBehavior extends BoatBehavior{
 
 	void setRudder(){
 		rudder = PIDcal(0, getHeadingDifference(desiredHeading, heading));
-		rudder +=180;
+		rudder +=180; //TODO I'm not sure if it should be here...
 		System.out.println("I'm setting the rudder to " + rudder + '\n');
 
 		if(rudder < 0){

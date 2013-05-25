@@ -37,7 +37,7 @@ public class Main{
 
 		for(;;){
 			try{
-				boat.update();
+				boat.sail();
 				Thread.sleep(100);
 			}catch(InterruptedException e){
 				e.printStackTrace();

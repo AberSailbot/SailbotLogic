@@ -41,8 +41,12 @@ public class Waypoints{
 		return points.get(nextWaypointNumber);
 	}
 	
+	public int getWaypointHeading(){
+		return (int) Utils.getHeading(boat.getPosition(), getNextWaypoint());
+	}
+	
 	public double getDistanceToWaypoint(){
-		return Position.getDistance(boat.getPosition(), getNextWaypoint());
+		return Utils.getDistance(boat.getPosition(), getNextWaypoint());
 	}
 	
 	public boolean moveToNext(){
