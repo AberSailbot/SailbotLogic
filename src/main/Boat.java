@@ -37,6 +37,8 @@ public class Boat{
 		rudderController = new RudderController(this);
 
         position = new Position ();
+        rudderPosition = 90;
+        updateRudder(rudderPosition);
         
         //Informing the Python program that waypoint has changed.
 		com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
@@ -90,11 +92,14 @@ public class Boat{
 			//STEP 3:
 			//If current boat heading is equal to waypoint heading,
 			//boat just continues sailing. Otherwise, course needs to be corrected.
-			if(Math.abs(Utils.getHeadingDifference(heading, waypoints.getWaypointHeading())) < 2){
-				
+			if(Math.abs(Utils.getHeadingDifference(heading, waypoints.getWaypointHeading())) < 3){
+				rudderPosition = 90;
 			}else{
 				int adjustment = rudderController.getRequiredChange(waypointHeading);
+				 rudderPosition += adjustment;
+			     
 			}
+			updateRudder(rudderPosition);
 			this.updateSail();
 			
 			try{
