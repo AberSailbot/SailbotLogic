@@ -1,7 +1,8 @@
 package main;
 
 import java.io.IOException;
-import behavior.*;
+
+import behavior.RudderController;
 
 /**
  * @author thip
@@ -10,10 +11,11 @@ import behavior.*;
  */
 public class Boat{
 	
-	private BoatBehavior behavior;
+	private RudderController behavior;
 	public Waypoints waypoints;
 	public Communication com;
-
+	private RudderController rudderController;
+	
 	private int heading;
 	private Position position;
 	private int absoluteWindDirection; 
@@ -31,8 +33,8 @@ public class Boat{
      */
 	public Boat(Waypoints wps){
 		waypoints = wps;
-		behavior = new PIDBehavior(this);
 		com = new Communication();
+		rudderController = new RudderController(this);
 
         position = new Position ();
         
@@ -47,7 +49,6 @@ public class Boat{
 	 */
 	public Boat(){
 		waypoints = new Waypoints(this);
-		behavior = new PIDBehavior(this);
 		com = new Communication();
 
         position = new Position ();
@@ -87,17 +88,19 @@ public class Boat{
 			} 
 			
 			//STEP 3:
-			//If current boat heading is (almost) equal to waypoint heading,
+			//If current boat heading is equal to waypoint heading,
 			//boat just continues sailing. Otherwise, course needs to be corrected.
 			if(Math.abs(Utils.getHeadingDifference(heading, waypoints.getWaypointHeading())) < 2){
-				try{
-					this.updateSail();
-					Thread.sleep(300);
-				}catch(InterruptedException e){
-					e.printStackTrace(); 
-				}
-			}else{
 				
+			}else{
+				int adjustment = rudderController.getRequiredChange(waypointHeading);
+			}
+			this.updateSail();
+			
+			try{
+				Thread.sleep(300);
+			}catch(InterruptedException e){
+				e.printStackTrace(); 
 			}
 			
 		}

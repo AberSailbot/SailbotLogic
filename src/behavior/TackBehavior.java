@@ -14,7 +14,7 @@ import main.Position;
 
 import static java.lang.Math.*;
 
-public class TackBehavior extends BoatBehavior{
+public class TackBehavior{
 /*
     private Position startPoint;
     private Position target;
