@@ -77,7 +77,7 @@ public class Boat{
 			
 			//Reading distance to waypoint and sending it to the Python program
 			distanceToWaypoint = waypoints.getDistanceToWaypoint();
-			com.sendMessage("set waypointdistance " + distanceToWaypoint);
+			
 			
 			System.out.println("Dist. to wp : " +distanceToWaypoint + ", should be less than " +Waypoints.WP_REACHED_THRESHOLD);
 			//Comparing the distance.
@@ -88,9 +88,13 @@ public class Boat{
 				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
 				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
 				com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
+				
+				distanceToWaypoint = waypoints.getDistanceToWaypoint();
 			}
 			
+			com.sendMessage("set waypointdistance " + distanceToWaypoint);
 			waypointHeading = waypoints.getWaypointHeading();
+			com.sendMessage("set waypointheading " + waypointHeading);
 			
 			//Printing data for testing and debugging
 			System.out.println("Position: " + position.getLat() + ", " + position.getLon());
