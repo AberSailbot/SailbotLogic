@@ -24,7 +24,7 @@ public class Waypoints{
 	/**
 	 * Defines how close the boat needs to get to a waypoint.
 	 */
-	public static final int WP_REACHED_THRESHOLD = 50;
+	public static final int WP_REACHED_THRESHOLD = 10;
 	
 	Boat boat;
 	

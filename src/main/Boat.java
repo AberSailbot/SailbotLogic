@@ -37,7 +37,7 @@ public class Boat{
 		rudderController = new RudderController(this);
 
         position = new Position ();
-        rudderPosition = 90;
+        rudderPosition = 180;
         updateRudder();
         
         //Informing the Python program that waypoint has changed.
@@ -103,26 +103,26 @@ public class Boat{
 			System.out.println("Waypoint heading: " + waypointHeading);
 			
 			//Checking if course on waypoint is directly sailable. 
-			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > 45){
+			//if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > 45){
 				//If course to waypoint is sailable
 				
 				//STEP 3:
 				//PID algorithm calculates rudder adjustments.
 				int adjustment = rudderController.getRequiredChange(waypointHeading);
-				rudderPosition += adjustment;
+				rudderPosition = 180 + adjustment;
 				     
 				
-			}else{
+			//}else{
 				//If course to waypoint is not sailable
-				System.out.println("Wind is blowing straight on me, i'm confused :'(");
+				//System.out.println("Wind is blowing straight on me, i'm confused :'(");
 				
-				try{
-					Thread.sleep(3000);
-				}catch(InterruptedException e){
-					e.printStackTrace(); 
-				}
+				//try{
+				//	Thread.sleep(300);
+				//}catch(InterruptedException e){
+				//	e.printStackTrace(); 
+				//}
 				
-			}
+			//}
 			
 			
 			

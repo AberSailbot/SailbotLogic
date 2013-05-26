@@ -1,4 +1,7 @@
 *.swap
 *.class
 *.swp
+.classpath
+.project
+.settings
 bin

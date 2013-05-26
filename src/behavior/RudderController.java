@@ -1,6 +1,7 @@
 package behavior;
 
 import main.Boat;
+import main.Utils;
 
 /**
  * @author thip
@@ -15,8 +16,8 @@ public class RudderController{
 	double dt = 0.3; // 300ms loop time
 	double MAX = 90; // For Current Saturation
 	double MIN = -90;
-	double Kp = 0.1;
-	double Ki = 0.005;
+	double Kp = 0.5;
+	double Ki = 0;
 	double Kd = 0.01;
 	
 	double previousError = 0;
@@ -41,8 +42,8 @@ public class RudderController{
 		double output;
 
 		// Caculate P,I,D
-		error = desiredHeading - boat.getHeading();
-
+		//error = desiredHeading - boat.getHeading();
+		error = Utils.getHeadingDifference(boat.getHeading(), desiredHeading);
 		// In case of error too small then stop intergration
 		if(Math.abs(error) > epsilon){
 			integral = integral + error * dt;
