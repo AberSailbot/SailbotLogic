@@ -24,7 +24,7 @@ public class Boat{
 	private int waypointHeading;
 	
 	private int rudderPosition;
-	
+	private int sailPosition;
 
     
 
@@ -38,7 +38,7 @@ public class Boat{
 
         position = new Position ();
         rudderPosition = 90;
-        updateRudder(rudderPosition);
+        updateRudder();
         
         //Informing the Python program that waypoint has changed.
 		com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
@@ -88,19 +88,35 @@ public class Boat{
 				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
 				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
 				com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
-			} else{ System.out.println(" FALSE");}
+			}
+			
+			waypointHeading = waypoints.getWaypointHeading();
+			
+			//Printing data for testing and debugging
+			System.out.println("Position: " + position.getLat() + ", " + position.getLon());
+			System.out.println("Heading: " + this.heading);
+			System.out.println("Absolute wind: " + absoluteWindDirection);
+			System.out.println("Relative wind: " + this.getRelativeWindDirection());
+			System.out.println("Sail :" + this.sailPosition);
+			System.out.println("Rudder : " + this.rudderPosition);
+			System.out.println("Waypoint number: " + waypoints.getNextWaypointNumber());
+			System.out.println("Waypoint heading: " + waypointHeading);
+			
+			
 			
 			//STEP 3:
-			//If current boat heading is equal to waypoint heading,
+			//If current boat heading is (almost) equal to waypoint heading,
 			//boat just continues sailing. Otherwise, course needs to be corrected.
-			if(Math.abs(Utils.getHeadingDifference(heading, waypoints.getWaypointHeading())) < 3){
+			if(Math.abs(Utils.getHeadingDifference(heading, waypointHeading)) < 3){
 				rudderPosition = 90;
 			}else{
 				int adjustment = rudderController.getRequiredChange(waypointHeading);
 				 rudderPosition += adjustment;
 			     
 			}
-			updateRudder(rudderPosition);
+			
+			
+			updateRudder();
 			this.updateSail();
 			
 			try{
@@ -140,7 +156,7 @@ public class Boat{
 	 * 
 	 * @param position
 	 */
-	public void updateRudder(int position){
+	public void updateRudder(){
 			com.sendMessage("set rudder " + rudderPosition);
 	}
 	
@@ -149,28 +165,27 @@ public class Boat{
 	 */
 	public void updateSail(){
 		//TODO So that sail is only updated every n seconds
-		int relativeDirection = this.getRelativeWindDirection();
-		int sailPosition; //Sail position that will be set.
+		int relativeWind = this.getRelativeWindDirection();
 		// Shamelessly stolen from Colin (for now) (yeah, for now lol)
-		if(relativeDirection < 180){
-			if(relativeDirection < 70)
+		if(relativeWind < 180){
+			if(relativeWind < 70)
 				sailPosition = 0;
-			else if(relativeDirection < 80)
+			else if(relativeWind < 80)
 				sailPosition = 18;
-			else if(relativeDirection < 90)
+			else if(relativeWind < 90)
 				sailPosition = 36;
-			else if(relativeDirection < 110)
+			else if(relativeWind < 110)
 				sailPosition = 54;
 			else
 				sailPosition = 72;
 		}else{
-			if(relativeDirection >= 290)
+			if(relativeWind >= 290)
 				sailPosition = 0;
-			else if(relativeDirection >= 280)
+			else if(relativeWind >= 280)
 				sailPosition = 342;
-			else if(relativeDirection >= 270)
+			else if(relativeWind >= 270)
 				sailPosition = 324;
-			else if(relativeDirection >= 250)
+			else if(relativeWind >= 250)
 				sailPosition = 306;
 			else
 				sailPosition = 288;

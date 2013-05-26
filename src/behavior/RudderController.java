@@ -60,8 +60,11 @@ public class RudderController{
 		// Update error
 		previousError = error;
 
+		System.out.print("P: " + Kp * error);
+		System.out.print(",  I: " + Ki * integral);
+		System.out.println(",  D:" + Kd * derivative);
 		System.out.println("PID output: " + output);
-		return (int) output;
+		return (int) Math.round(output);
 	}
 
 	
