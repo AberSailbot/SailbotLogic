@@ -24,7 +24,7 @@ public class Waypoints{
 	/**
 	 * Defines how close the boat needs to get to a waypoint.
 	 */
-	public static final int WP_REACHED_THRESHOLD = 10;
+	public static final int WP_REACHED_THRESHOLD = 50;
 	
 	Boat boat;
 	
@@ -50,10 +50,14 @@ public class Waypoints{
 	}
 	
 	public boolean moveToNext(){
-		if(points.size() < nextWaypointNumber+1){
+		System.out.println("Increasing waypoint number");
+		System.out.println("Total waypoints: " + points.size());
+		if(points.size() -1 > nextWaypointNumber){
 			nextWaypointNumber++;
+			System.out.println("WP number now: " + nextWaypointNumber);
 			return true;
 		}else{
+			System.out.println("Setting WP number to 0");
 			nextWaypointNumber = 0;
 			return false;
 		}

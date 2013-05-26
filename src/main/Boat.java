@@ -79,6 +79,7 @@ public class Boat{
 			distanceToWaypoint = waypoints.getDistanceToWaypoint();
 			com.sendMessage("set waypointdistance " + distanceToWaypoint);
 			
+			System.out.println("Dist. to wp : " +distanceToWaypoint + ", should be less than " +Waypoints.WP_REACHED_THRESHOLD);
 			//Comparing the distance.
 			if(distanceToWaypoint < Waypoints.WP_REACHED_THRESHOLD){
 				System.out.println("Waypoint " + waypoints.getNextWaypointNumber() + " reached, moving to next one");
@@ -87,7 +88,7 @@ public class Boat{
 				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
 				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
 				com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
-			} 
+			} else{ System.out.println(" FALSE");}
 			
 			//STEP 3:
 			//If current boat heading is equal to waypoint heading,
