@@ -17,5 +17,8 @@ public class TestValues{
 		System.out.println("Distance : " + Utils.getDistance(a, b));
 		System.out.println("Heading : " + Utils.getHeading(a, b) );
 		
+		int heading = 40, desired = 340;
+		System.out.println("Difference : " + Utils.getHeadingDifference(heading, desired));
+		
 	}
 }

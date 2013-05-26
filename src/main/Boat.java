@@ -102,18 +102,29 @@ public class Boat{
 			System.out.println("Waypoint number: " + waypoints.getNextWaypointNumber());
 			System.out.println("Waypoint heading: " + waypointHeading);
 			
-			
-			
-			//STEP 3:
-			//If current boat heading is (almost) equal to waypoint heading,
-			//boat just continues sailing. Otherwise, course needs to be corrected.
-			if(Math.abs(Utils.getHeadingDifference(heading, waypointHeading)) < 3){
-				rudderPosition = 90;
-			}else{
+			//Checking if course on waypoint is directly sailable. 
+			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > 45){
+				//If course to waypoint is sailable
+				
+				//STEP 3:
+				//PID algorithm calculates rudder adjustments.
 				int adjustment = rudderController.getRequiredChange(waypointHeading);
-				 rudderPosition += adjustment;
-			     
+				rudderPosition += adjustment;
+				     
+				
+			}else{
+				//If course to waypoint is not sailable
+				System.out.println("Wind is blowing straight on me, i'm confused :'(");
+				
+				try{
+					Thread.sleep(3000);
+				}catch(InterruptedException e){
+					e.printStackTrace(); 
+				}
+				
 			}
+			
+			
 			
 			
 			updateRudder();

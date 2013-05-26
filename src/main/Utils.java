@@ -12,7 +12,9 @@ package main;
 public class Utils{
 
 	/**
-	 * Returns difference in heading between two headings.
+	 * Returns difference in heading between two headings. 
+	 * Positive if  heading2 is to the left of heading1, negative otherwise.
+	 * 
 	 * @param heading1
 	 * @param heading2
 	 * @return
