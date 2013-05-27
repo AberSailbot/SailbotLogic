@@ -11,6 +11,11 @@ import behavior.RudderController;
  */
 public class Boat{
 	
+	/**
+	 * How close can we sail to the wind.
+	 */
+	public static final int HOW_CLOSE = 45;
+	
 	private RudderController behavior;
 	public Waypoints waypoints;
 	public Communication com;
@@ -27,11 +32,12 @@ public class Boat{
 	private int sailPosition;
 
 	//For tacking:
-	double distOnLeft = 5.0, distOnRight;
-    char currentSide = 'L'; //Left or right
-    boolean tackingSet = false;
-    Position startPoint;
-    int targetHeading;
+	private double maxDistOnSide = 5.0;
+	private double distOnLeft, distOnRight;
+	private char currentSide = 'L'; //Left or right
+	private boolean tackingSet = false;
+	private Position startPoint;
+	private int targetHeading;
 
     /**
      * Creates boat with given waypoints.
@@ -112,11 +118,12 @@ public class Boat{
 			System.out.println("Waypoint heading: " + waypointHeading);
 			
 			//Checking if course on waypoint is directly sailable. 
-			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > 45){
+			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > HOW_CLOSE){
 				//If course to waypoint is sailable
 				tackingSet = false;
 				
-				//STEP 3:
+				//STEP 3a:
+				//Going with the wind, simply heading towards waypoint.
 				//PID algorithm calculates rudder adjustments.
 				int adjustment = rudderController.getRequiredChange(waypointHeading);
 				rudderPosition = 180 + adjustment;
@@ -125,27 +132,53 @@ public class Boat{
 			}else{
 				//If course to waypoint is not directly sailable
 				
+				//STEP 3b:
+				//Beating to windward.
+				
+				//If just started going towards the wind, tackling needs to be set up.
 				if(!tackingSet){
-					this.currentSide = 'L';
+					
 					double dSquared = distanceToWaypoint * distanceToWaypoint;
-					double distOnLeftSquared = distOnLeft * distOnLeft;
-					distOnRight = Math.sqrt(dSquared + distOnLeftSquared);
+					
+					//Checking which side is favorable, i. e. closer to waypoint heading.
+					if(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection + HOW_CLOSE)
+							< Utils.getHeadingDifference(waypointHeading, absoluteWindDirection - HOW_CLOSE)){
+						//If right side is favorable
+						currentSide = 'R';
+						distOnRight = maxDistOnSide;
+						distOnLeft = Math.sqrt(dSquared - distOnRight * distOnRight);
+						targetHeading = absoluteWindDirection + HOW_CLOSE;
+						if(targetHeading > 360) targetHeading -= 360;
+						
+					}else{
+						//If left side is favorable
+						currentSide = 'L';
+						distOnLeft = maxDistOnSide;
+						distOnRight = Math.sqrt(dSquared - distOnLeft * distOnLeft);
+						targetHeading = absoluteWindDirection - HOW_CLOSE;
+						if(targetHeading < 0) targetHeading = 360 + targetHeading;
+					}
+					
 					startPoint = new Position(position.getLat(), position.getLon());
 				}
 				
+				//Checking if side should be changed
 				if(currentSide == 'L' && Utils.getDistance(startPoint, position) > distOnLeft){
+					//Switching to right side
 					currentSide = 'R';
 					startPoint = new Position(position.getLat(), position.getLon());
-					targetHeading = absoluteWindDirection - 45;
-					if(targetHeading < 0) targetHeading = 360 + targetHeading;
-				}
-				if(currentSide == 'R' && Utils.getDistance(startPoint, position) > distOnRight){
-					currentSide = 'L';
-					startPoint = new Position(position.getLat(), position.getLon());
-					targetHeading = absoluteWindDirection + 45;
+					targetHeading = absoluteWindDirection + HOW_CLOSE;
 					if(targetHeading > 360) targetHeading -= 360;
 				}
+				if(currentSide == 'R' && Utils.getDistance(startPoint, position) > distOnRight){
+					//Switching to left side
+					currentSide = 'L';
+					startPoint = new Position(position.getLat(), position.getLon());
+					targetHeading = absoluteWindDirection - HOW_CLOSE;
+					if(targetHeading < 0) targetHeading = 360 + targetHeading;
+				}
 				
+				//Actually adjusting rudder with 
 				int adjustment = rudderController.getRequiredChange(targetHeading);
 				rudderPosition = 180 + adjustment;
 				
