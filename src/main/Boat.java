@@ -26,7 +26,12 @@ public class Boat{
 	private int rudderPosition;
 	private int sailPosition;
 
-    
+	//For tacking:
+	double distOnLeft = 5.0, distOnRight;
+    char currentSide = 'L'; //Left or right
+    boolean tackingSet = false;
+    Position startPoint;
+    int targetHeading;
 
     /**
      * Creates boat with given waypoints.
@@ -107,8 +112,9 @@ public class Boat{
 			System.out.println("Waypoint heading: " + waypointHeading);
 			
 			//Checking if course on waypoint is directly sailable. 
-			//if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > 45){
+			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > 45){
 				//If course to waypoint is sailable
+				tackingSet = false;
 				
 				//STEP 3:
 				//PID algorithm calculates rudder adjustments.
@@ -116,22 +122,37 @@ public class Boat{
 				rudderPosition = 180 + adjustment;
 				     
 				
-			//}else{
-				//If course to waypoint is not sailable
-				//System.out.println("Wind is blowing straight on me, i'm confused :'(");
+			}else{
+				//If course to waypoint is not directly sailable
 				
-				//try{
-				//	Thread.sleep(300);
-				//}catch(InterruptedException e){
-				//	e.printStackTrace(); 
-				//}
+				if(!tackingSet){
+					this.currentSide = 'L';
+					double dSquared = distanceToWaypoint * distanceToWaypoint;
+					double distOnLeftSquared = distOnLeft * distOnLeft;
+					distOnRight = Math.sqrt(dSquared + distOnLeftSquared);
+					startPoint = new Position(position.getLat(), position.getLon());
+				}
 				
-			//}
+				if(currentSide == 'L' && Utils.getDistance(startPoint, position) > distOnLeft){
+					currentSide = 'R';
+					startPoint = new Position(position.getLat(), position.getLon());
+					targetHeading = absoluteWindDirection - 45;
+					if(targetHeading < 0) targetHeading = 360 + targetHeading;
+				}
+				if(currentSide == 'R' && Utils.getDistance(startPoint, position) > distOnRight){
+					currentSide = 'L';
+					startPoint = new Position(position.getLat(), position.getLon());
+					targetHeading = absoluteWindDirection + 45;
+					if(targetHeading > 360) targetHeading -= 360;
+				}
+				
+				int adjustment = rudderController.getRequiredChange(targetHeading);
+				rudderPosition = 180 + adjustment;
+				
+			}
 			
 			
-			
-			
-			updateRudder();
+			this.updateRudder();
 			this.updateSail();
 			
 			try{
