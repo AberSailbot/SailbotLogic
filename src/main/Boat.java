@@ -138,6 +138,11 @@ public class Boat{
 				//If just started going towards the wind, tackling needs to be set up.
 				if(!tackingSet){
 					
+					int angle = Utils.getHeadingDifference(absoluteWindDirection-45, waypointHeading);
+					angle = Math.abs(angle);
+					distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
+					distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
+					
 					double dSquared = distanceToWaypoint * distanceToWaypoint;
 					
 					//Checking which side is favorable, i. e. closer to waypoint heading.
@@ -145,16 +150,12 @@ public class Boat{
 							< Utils.getHeadingDifference(waypointHeading, absoluteWindDirection - HOW_CLOSE)){
 						//If right side is favorable
 						currentSide = 'R';
-						distOnRight = maxDistOnSide;
-						distOnLeft = Math.sqrt(dSquared - distOnRight * distOnRight);
 						targetHeading = absoluteWindDirection + HOW_CLOSE;
 						if(targetHeading > 360) targetHeading -= 360;
 						
 					}else{
 						//If left side is favorable
 						currentSide = 'L';
-						distOnLeft = maxDistOnSide;
-						distOnRight = Math.sqrt(dSquared - distOnLeft * distOnLeft);
 						targetHeading = absoluteWindDirection - HOW_CLOSE;
 						if(targetHeading < 0) targetHeading = 360 + targetHeading;
 					}
