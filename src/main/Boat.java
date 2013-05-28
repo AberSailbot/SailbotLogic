@@ -143,8 +143,6 @@ public class Boat{
 					distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
 					distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
 					
-					double dSquared = distanceToWaypoint * distanceToWaypoint;
-					
 					//Checking which side is favorable, i. e. closer to waypoint heading.
 					if(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection + HOW_CLOSE)
 							< Utils.getHeadingDifference(waypointHeading, absoluteWindDirection - HOW_CLOSE)){
@@ -163,15 +161,24 @@ public class Boat{
 					startPoint = new Position(position.getLat(), position.getLon());
 				}
 				
+				double currentDistance = Utils.getDistance(startPoint, position);
+				
+				if(currentSide == 'R'){
+					com.sendMessage("set tdist " + (distOnRight - currentDistance));
+				}else{
+					com.sendMessage("set tdist " + (distOnLeft - currentDistance));
+				}
+				
 				//Checking if side should be changed
-				if(currentSide == 'L' && Utils.getDistance(startPoint, position) > distOnLeft){
+				if(currentSide == 'L' && currentDistance > distOnLeft){
 					//Switching to right side
 					currentSide = 'R';
 					startPoint = new Position(position.getLat(), position.getLon());
 					targetHeading = absoluteWindDirection + HOW_CLOSE;
 					if(targetHeading > 360) targetHeading -= 360;
+					
 				}
-				if(currentSide == 'R' && Utils.getDistance(startPoint, position) > distOnRight){
+				if(currentSide == 'R' && currentDistance > distOnRight){
 					//Switching to left side
 					currentSide = 'L';
 					startPoint = new Position(position.getLat(), position.getLon());
@@ -217,7 +224,8 @@ public class Boat{
 		//Python code sends absolute wind direction.
 		com.sendMessage("get wind_dir");
 		absoluteWindDirection = Integer.parseInt(com.readMessage()) - heading;
-
+		if(absoluteWindDirection < 0) absoluteWindDirection = 360 + absoluteWindDirection;
+		
 	}
 
 
