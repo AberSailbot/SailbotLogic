@@ -180,6 +180,8 @@ public class Boat{
 	 */
 	public void updateSail(){
 		//TODO So that sail is only updated every n seconds
+		//Could instead only update the sail every n times 
+		//the method is called, would probably be simpler
 		int relativeWind = this.getRelativeWindDirection();
 		//quick fix for the upside - down wind problem
 		relativeWind +=180;
