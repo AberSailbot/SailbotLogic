@@ -16,7 +16,7 @@ public class Communication{
 
 	public Communication(){
 		try{
-			socket = new Socket("localhost", 10006); //10006);
+			socket = new Socket("localhost", 5555); //10006);
 			transmit = new PrintWriter(socket.getOutputStream(), true);
 			receive = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
