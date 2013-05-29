@@ -31,6 +31,8 @@ public class Boat{
 	private int rudderPosition;
 	private int sailPosition;
 
+    private long sailLastUpdated;
+
 	//For tacking:
 	private double maxDistOnSide = 5.0;
 	private double distOnLeft, distOnRight;
@@ -234,38 +236,42 @@ public class Boat{
 	 * Calculates how tense the sail should be and tells the Python program to set it.
 	 */
 	public void updateSail(){
-		//TODO So that sail is only updated every n seconds
-		int relativeWind = this.getRelativeWindDirection();
-		//quick fix for the upside - down wind problem
-		relativeWind +=180;
-		if(relativeWind > 360) relativeWind -= 360;
-		
-		// Shamelessly stolen from Colin (for now) (yeah, for now lol)
-		if(relativeWind < 180){
-			if(relativeWind < 70)
-				sailPosition = 0;
-			else if(relativeWind < 80)
-				sailPosition = 18;
-			else if(relativeWind < 90)
-				sailPosition = 36;
-			else if(relativeWind < 110)
-				sailPosition = 54;
-			else
-				sailPosition = 72;
-		}else{
-			if(relativeWind >= 290)
-				sailPosition = 0;
-			else if(relativeWind >= 280)
-				sailPosition = 342;
-			else if(relativeWind >= 270)
-				sailPosition = 324;
-			else if(relativeWind >= 250)
-				sailPosition = 306;
-			else
-				sailPosition = 288;
-		}
-		System.out.println("I am setting the sail to " + sailPosition);
-		com.sendMessage("set sail " + sailPosition);
+        long currentTime = System.currentTimeMillis() / 1000L;
+        if (currentTime - sailLastUpdated > 20) {
+            sailLastUpdated = currentTime;
+            int relativeWind = this.getRelativeWindDirection();
+
+            //quick fix for the upside - down wind problem
+            relativeWind +=180;
+            if(relativeWind > 360) relativeWind -= 360;
+            
+            // Shamelessly stolen from Colin (for now) (yeah, for now lol)
+            if(relativeWind < 180){
+                if(relativeWind < 70)
+                    sailPosition = 0;
+                else if(relativeWind < 80)
+                    sailPosition = 18;
+                else if(relativeWind < 90)
+                    sailPosition = 36;
+                else if(relativeWind < 110)
+                    sailPosition = 54;
+                else
+                    sailPosition = 72;
+            } else{
+                if(relativeWind >= 290)
+                    sailPosition = 0;
+                else if(relativeWind >= 280)
+                    sailPosition = 342;
+                else if(relativeWind >= 270)
+                    sailPosition = 324;
+                else if(relativeWind >= 250)
+                    sailPosition = 306;
+                else
+                    sailPosition = 288;
+            }
+            System.out.println("I am setting the sail to " + sailPosition);
+            com.sendMessage("set sail " + sailPosition);
+        }
 	}
 
 	/**
