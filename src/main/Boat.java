@@ -34,12 +34,13 @@ public class Boat{
     private long sailLastUpdated;
 
 	//For tacking:
-	private double maxDistOnSide = 5.0;
+	private double maxDistOnSide = 30.0;
 	private double distOnLeft, distOnRight;
 	private char currentSide = 'L'; //Left or right
 	private boolean tackingSet = false;
 	private Position startPoint;
 	private int targetHeading;
+	double currentDistance, targetDistance;
 
     /**
      * Creates boat with given waypoints.
@@ -118,11 +119,15 @@ public class Boat{
 			System.out.println("Rudder : " + this.rudderPosition);
 			System.out.println("Waypoint number: " + waypoints.getNextWaypointNumber());
 			System.out.println("Waypoint heading: " + waypointHeading);
+			System.out.println("Tacking: " + tackingSet);
+			System.out.println("Target heading: " + targetHeading);
+			System.out.println("Target distance: " + targetDistance);
 			
 			//Checking if course on waypoint is directly sailable. 
 			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > HOW_CLOSE){
 				//If course to waypoint is sailable
 				tackingSet = false;
+				targetHeading = waypointHeading;
 				
 				//STEP 3a:
 				//Going with the wind, simply heading towards waypoint.
@@ -145,8 +150,6 @@ public class Boat{
 					distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
 					distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
 					
-					double dSquared = distanceToWaypoint * distanceToWaypoint;
-					
 					//Checking which side is favorable, i. e. closer to waypoint heading.
 					if(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection + HOW_CLOSE)
 							< Utils.getHeadingDifference(waypointHeading, absoluteWindDirection - HOW_CLOSE)){
@@ -163,17 +166,29 @@ public class Boat{
 					}
 					
 					startPoint = new Position(position.getLat(), position.getLon());
+					
+					tackingSet = true;
 				}
 				
+				currentDistance = Utils.getDistance(startPoint, position);
+				
+				if(currentSide == 'R'){
+					targetDistance = distOnRight - currentDistance;
+				}else{
+					targetDistance = distOnLeft - currentDistance;
+				}
+				com.sendMessage("set tdist " + targetDistance);
+				
+				
 				//Checking if side should be changed
-				if(currentSide == 'L' && Utils.getDistance(startPoint, position) > distOnLeft){
+				if(currentSide == 'L' && currentDistance > distOnLeft){
 					//Switching to right side
 					currentSide = 'R';
 					startPoint = new Position(position.getLat(), position.getLon());
 					targetHeading = absoluteWindDirection + HOW_CLOSE;
 					if(targetHeading > 360) targetHeading -= 360;
-				}
-				if(currentSide == 'R' && Utils.getDistance(startPoint, position) > distOnRight){
+					
+				}else if(currentSide == 'R' && currentDistance > distOnRight){
 					//Switching to left side
 					currentSide = 'L';
 					startPoint = new Position(position.getLat(), position.getLon());
@@ -185,6 +200,7 @@ public class Boat{
 				int adjustment = rudderController.getRequiredChange(targetHeading);
 				rudderPosition = 180 + adjustment;
 				
+				System.out.println("DistOnLeft : " + distOnLeft + " , DistOnRight: " + distOnRight);
 			}
 			
 			
@@ -218,8 +234,9 @@ public class Boat{
 
 		//Python code sends absolute wind direction.
 		com.sendMessage("get wind_dir");
-		absoluteWindDirection = Integer.parseInt(com.readMessage()) - heading;
-
+		absoluteWindDirection = Integer.parseInt(com.readMessage()); //- heading;
+		//if(absoluteWindDirection < 0) absoluteWindDirection = 360 + absoluteWindDirection;
+		
 	}
 
 
@@ -236,9 +253,9 @@ public class Boat{
 	 * Calculates how tense the sail should be and tells the Python program to set it.
 	 */
 	public void updateSail(){
-        long currentTime = System.currentTimeMillis() / 1000L;
-        if (currentTime - sailLastUpdated > 20) {
-            sailLastUpdated = currentTime;
+        //long currentTime = System.currentTimeMillis() / 1000L;
+        //if (currentTime - sailLastUpdated > 10) {
+        //    sailLastUpdated = currentTime;
             int relativeWind = this.getRelativeWindDirection();
 
             //quick fix for the upside - down wind problem
@@ -271,8 +288,9 @@ public class Boat{
             }
             System.out.println("I am setting the sail to " + sailPosition);
             com.sendMessage("set sail " + sailPosition);
-        }
+        //}
 	}
+
 
 	/**
 	 * Returns wind direction relative to the boat.

@@ -12,11 +12,11 @@ public class RudderController{
 
 	protected Boat boat;
 	
-	int epsilon = 4; 
+	int epsilon = 2; 
 	double dt = 0.3; // 300ms loop time
 	double MAX = 90; // For Current Saturation
 	double MIN = -90;
-	double Kp = 0.5;
+	double Kp = 1.8;
 	double Ki = 0;
 	double Kd = 0.01;
 	
