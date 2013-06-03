@@ -133,9 +133,10 @@ public class Waypoints{
 	public void setBoat(Boat boat){
 		this.boat = boat;
 	}
-	
-	
-	
-	
+
+	public Position get(int index){
+		return points.get(index);
+	}
+		
 	
 }

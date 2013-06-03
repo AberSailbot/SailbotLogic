@@ -217,6 +217,156 @@ public class Boat{
 				
 	}
 
+	
+	public void sailTowards(int desiredHeading){
+		try{
+			readSensors();
+		}catch(IOException ex){
+			ex.printStackTrace();
+		}
+		//Checking if course on waypoint is directly sailable. 
+		if(Math.abs(Utils.getHeadingDifference(desiredHeading, absoluteWindDirection)) > HOW_CLOSE){
+			//If course to waypoint is sailable
+			tackingSet = false;
+			targetHeading = desiredHeading;
+			int adjustment = rudderController.getRequiredChange(desiredHeading);
+			rudderPosition = 180 + adjustment;
+		}else{
+			//If course to waypoint is not directly sailable
+					
+			//If just started going towards the wind, tackling needs to be set up.
+			if(!tackingSet){
+				int angle = Utils.getHeadingDifference(absoluteWindDirection-45, desiredHeading);
+				angle = Math.abs(angle);
+				distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
+				distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
+				//Checking which side is favorable, i. e. closer to waypoint heading.
+				if(Utils.getHeadingDifference(desiredHeading, absoluteWindDirection + HOW_CLOSE)
+						< Utils.getHeadingDifference(desiredHeading, absoluteWindDirection - HOW_CLOSE)){
+					//If right side is favorable
+					currentSide = 'R';
+					targetHeading = absoluteWindDirection + HOW_CLOSE;
+					if(targetHeading > 360) targetHeading -= 360;	
+				}else{
+					//If left side is favorable
+					currentSide = 'L';
+					targetHeading = absoluteWindDirection - HOW_CLOSE;
+					if(targetHeading < 0) targetHeading = 360 + targetHeading;
+				}
+				startPoint = new Position(position.getLat(), position.getLon());
+				tackingSet = true;
+			}
+			
+			currentDistance = Utils.getDistance(startPoint, position);
+			
+			if(currentSide == 'R'){
+				targetDistance = distOnRight - currentDistance;
+			}else{
+				targetDistance = distOnLeft - currentDistance;
+			}
+			com.sendMessage("set tdist " + targetDistance);
+			
+			
+			//Checking if side should be changed
+			if(currentSide == 'L' && currentDistance > distOnLeft){
+				//Switching to right side
+				currentSide = 'R';
+				startPoint = new Position(position.getLat(), position.getLon());
+				targetHeading = absoluteWindDirection + HOW_CLOSE;
+				if(targetHeading > 360) targetHeading -= 360;
+				
+			}else if(currentSide == 'R' && currentDistance > distOnRight){
+				//Switching to left side
+				currentSide = 'L';
+				startPoint = new Position(position.getLat(), position.getLon());
+				targetHeading = absoluteWindDirection - HOW_CLOSE;
+				if(targetHeading < 0) targetHeading = 360 + targetHeading;
+			}
+			//Actually adjusting rudder with 
+			int adjustment = rudderController.getRequiredChange(targetHeading);
+			rudderPosition = 180 + adjustment;
+		}
+		//Sending commands to actuators.
+		this.updateRudder();
+		this.updateSail();
+	}
+	
+	public void keepStation(){
+		
+		//Four indices of the box in which boat must stay.
+		Position[] box = new Position[4];
+		for(int i = 0; i < 4; i++) box[i] = this.waypoints.get(i);
+		
+		//Calculating coordinates of the point in centre of the box.
+		double centreLat = (box[0].getLat() + box[3].getLat()) / 2.0;
+		double centreLon = (box[0].getLon() + box[1].getLon()) / 2.0;
+		Position centre = new Position(centreLat, centreLon);
+		
+		long currentTime = System.currentTimeMillis() / 1000L;
+		long timeWhenEnteredBox = 0, timeWhenReachedMiddle = 0;
+		
+		//PART 1. Go to the middle of the box.
+		double distanceToMiddle;
+		int desiredHeading = (int) Utils.getHeading(position, centre);
+		int enteringHeading = desiredHeading;
+		
+		while(true){
+			sailTowards(desiredHeading);
+			distanceToMiddle = Utils.getDistance(position, centre);
+			if(timeWhenEnteredBox==0){
+				if(Utils.areInOrder(box[0].getLat(),position.getLat(), box[3].getLat()) &&
+						Utils.areInOrder(box[0].getLon(), position.getLon(), box[1].getLon())){
+					//ENTERED THE BOX
+					timeWhenEnteredBox = System.currentTimeMillis() / 1000L;
+				}
+			}
+			if(distanceToMiddle < Waypoints.WP_REACHED_THRESHOLD){
+				//REACHED THE MIDDLE
+				timeWhenReachedMiddle = System.currentTimeMillis() / 1000L;
+				//TODO that will not be accurate (10 meters threshold!)
+				break;
+			}
+			desiredHeading = (int) Utils.getHeading(position, centre);
+			try{
+				Thread.sleep(300);
+			}catch(InterruptedException ex){
+				ex.printStackTrace();
+			}
+		}
+		
+		//At that time the boat should start moving out of the box.
+		long boxLeavingTime = timeWhenEnteredBox + 300 - (timeWhenReachedMiddle - timeWhenEnteredBox);
+		
+		//PART 2 : Stay in the middle for 5 minutes - time needed to get out of the box.
+		desiredHeading = (int) Utils.getHeading(position, centre);
+		while(true){
+			sailTowards(desiredHeading);
+			desiredHeading = (int) Utils.getHeading(position, centre);
+			if((System.currentTimeMillis() / 1000L) >= boxLeavingTime){
+				//TIME TO LEAVE THE BOX
+				break;
+			}
+			try{
+				Thread.sleep(300);
+			}catch(InterruptedException ex){
+				ex.printStackTrace();
+			}
+		}
+		
+		//PART 3 : Get the hell out!
+		desiredHeading = (enteringHeading + 180) % 360;
+		while(true){
+			sailTowards(desiredHeading);
+			//TODO stop when out of the box?
+			try{
+				Thread.sleep(300);
+			}catch(InterruptedException ex){
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	
 	public void readSensors() throws IOException{
 		
 		// Getting GPS location

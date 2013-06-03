@@ -71,4 +71,10 @@ public class Utils{
 		return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
 	}
 	
+	public static boolean areInOrder(Double a, Double b, Double c){
+		if(b > a && c > b) return true;
+		if(b < a && c < b) return true;
+		return false;
+	}
+	
 }
