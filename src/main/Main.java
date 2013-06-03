@@ -10,13 +10,25 @@ import java.io.IOException;
  */
 public class Main{
 
+	/**
+	 * 
+	 * @param args0 mode ("race" or "station")
+	 * @param args1 waypoint file name
+	 */
 	public static void main(String[] args){
 
+		if(args==null || args.length<2){
+			System.out.println("Missing parameters!");
+			System.out.println("parameter 1 : mode of operation");
+			System.out.println("Those are 'race' or 'station'");
+			System.out.println("parameter 2 : name of waypoints file");
+		}
+		
 		String waypointsFile;
-		if(args[0]==null){
+		if(args[1]==null){
 			System.out.println("Waypoints file not specified, using default : waypoints.txt");
 			waypointsFile = "waypoints.txt";
-		}else waypointsFile = args[0];
+		}else waypointsFile = args[1];
 		
 		File wpFile = new File(waypointsFile);
 		Waypoints wps = new Waypoints(null);
@@ -35,13 +47,8 @@ public class Main{
 		Boat boat = new Boat(wps);
 		wps.setBoat(boat);
 
-		for(;;){
-			try{
-				boat.sail();
-				Thread.sleep(100);
-			}catch(InterruptedException e){
-				e.printStackTrace();
-			}
-		}
+		if(args[0].equalsIgnoreCase("race")) boat.sail();
+		else if(args[0].equalsIgnoreCase("station")) boat.keepStation();
+		else System.out.println("Incorrect mode parameter!");
 	}
 }
