@@ -16,11 +16,12 @@ public class RudderController{
 	double dt = 0.3; // 300ms loop time
 	double MAX = 90; // For Current Saturation
 	double MIN = -90;
-	double Kp = 1.8;
-	double Ki = 0;
+	double Kp = 1.3;
+	double Ki = 0.05;
 	double Kd = 0.01;
 	
 	double previousError = 0;
+	int previousHeading;
 	double integral = 0;
 	
 
@@ -40,6 +41,12 @@ public class RudderController{
 		double derivative;
 		
 		double output;
+		
+		//If desired heading changes, integral is reset.
+		if(previousHeading!=desiredHeading){
+			integral = 0;
+			previousHeading = desiredHeading;
+		}
 
 		// Caculate P,I,D
 		//error = desiredHeading - boat.getHeading();
