@@ -409,8 +409,8 @@ public class Boat{
             int relativeWind = this.getRelativeWindDirection();
 
             //quick fix for the upside - down wind problem
-            relativeWind +=180;
-            if(relativeWind > 360) relativeWind -= 360;
+            //relativeWind +=180;
+            //if(relativeWind > 360) relativeWind -= 360;
             
             // Shamelessly stolen from Colin (for now) (yeah, for now lol)
             if(relativeWind < 180){
@@ -428,13 +428,13 @@ public class Boat{
                 if(relativeWind >= 290)
                     sailPosition = 0;
                 else if(relativeWind >= 280)
-                    sailPosition = 342;
+                    sailPosition = 18; //342
                 else if(relativeWind >= 270)
-                    sailPosition = 324;
+                    sailPosition = 36; //324
                 else if(relativeWind >= 250)
-                    sailPosition = 306;
+                    sailPosition = 54; //306
                 else
-                    sailPosition = 288;
+                    sailPosition = 72; //288
             }
             System.out.println("I am setting the sail to " + sailPosition);
             com.sendMessage("set sail " + sailPosition);

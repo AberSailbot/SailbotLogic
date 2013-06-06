@@ -16,7 +16,7 @@ public class TestRudder{
 	 */
 	public static void main(String[] args){
 		Boat boat = new Boat();
-
+		
 		for(int i = 90; i<=270; i+=10){
 			try{
 				System.out.print("Setting rudder to " + i + " degrees.");

@@ -18,7 +18,6 @@ public class TestSail{
 		Boat boat = new Boat();
 
 		try{
-
 			System.out.println("Setting sail to 0 degrees.");
 			boat.com.sendMessage("set sail 0");
 			Thread.sleep(5000);
