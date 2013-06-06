@@ -354,10 +354,10 @@ public class Boat{
 		}
 		
 		//PART 3 : Get the hell out!
-		desiredHeading = (enteringHeading + 180) % 360;
+		desiredHeading = enteringHeading;
 		while(true){
 			sailTowards(desiredHeading);
-			//TODO stop when out of the box?
+			//TODO maybe stop when out of the box?
 			try{
 				Thread.sleep(300);
 			}catch(InterruptedException ex){
