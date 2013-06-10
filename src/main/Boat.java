@@ -6,7 +6,7 @@ import behavior.RudderController;
 
 /**
  * @author thip
- * @author Kamil Mrowiec <kam20@aber.ac.uk>
+ * @author Kamil Mrowiec <kam20@aber.ac.uk> 300
  * @version 1.0 (4 May 2013)
  */
 public class Boat{
@@ -15,6 +15,13 @@ public class Boat{
 	 * How close can we sail to the wind.
 	 */
 	public static final int HOW_CLOSE = 45;
+	
+	/**
+	 * How long should the boat stay inside the box (for station keeping)
+	 * (in seconds, originally 5 minutes - 300 seconds);
+	 */
+	public static final int BOX_TIME = 300;
+	
 	
 	private RudderController behavior;
 	public Waypoints waypoints;
@@ -34,14 +41,16 @@ public class Boat{
     private long sailLastUpdated;
 
 	//For tacking:
-	private double maxDistOnSide = 30.0;
+	private double maxDistOnSide = 10.0;
 	private double distOnLeft, distOnRight;
 	private char currentSide = 'L'; //Left or right
 	private boolean tackingSet = false;
 	private Position startPoint;
 	private int targetHeading;
 	double currentDistance, targetDistance;
-
+	
+	
+	
     /**
      * Creates boat with given waypoints.
      */
@@ -286,6 +295,18 @@ public class Boat{
 			int adjustment = rudderController.getRequiredChange(targetHeading);
 			rudderPosition = 180 + adjustment;
 		}
+		
+		System.out.println("Position: " + position.getLat() + ", " + position.getLon());
+		System.out.println("Heading: " + this.heading);
+		System.out.println("Absolute wind: " + absoluteWindDirection);
+		System.out.println("Relative wind: " + this.getRelativeWindDirection());
+		System.out.println("Sail :" + this.sailPosition);
+		System.out.println("Rudder : " + this.rudderPosition);
+		System.out.println("Tacking: " + tackingSet);
+		System.out.println("Target heading: " + targetHeading);
+		System.out.println("Target distance: " + targetDistance);
+		System.out.println("Desired heading: " + desiredHeading);
+		
 		//Sending commands to actuators.
 		this.updateRudder();
 		this.updateSail();
@@ -311,6 +332,7 @@ public class Boat{
 		int enteringHeading = desiredHeading;
 		
 		while(true){
+			System.out.println("Entering heading : " + enteringHeading);
 			sailTowards(desiredHeading);
 			distanceToMiddle = Utils.getDistance(position, centre);
 			if(timeWhenEnteredBox==0){
@@ -318,6 +340,7 @@ public class Boat{
 						Utils.areInOrder(box[0].getLon(), position.getLon(), box[1].getLon())){
 					//ENTERED THE BOX
 					timeWhenEnteredBox = System.currentTimeMillis() / 1000L;
+					enteringHeading = desiredHeading;
 				}
 			}
 			if(distanceToMiddle < Waypoints.WP_REACHED_THRESHOLD){
@@ -335,11 +358,12 @@ public class Boat{
 		}
 		
 		//At that time the boat should start moving out of the box.
-		long boxLeavingTime = timeWhenEnteredBox + 300 - (timeWhenReachedMiddle - timeWhenEnteredBox);
+		long boxLeavingTime = timeWhenEnteredBox + BOX_TIME - (timeWhenReachedMiddle - timeWhenEnteredBox);
 		
 		//PART 2 : Stay in the middle for 5 minutes - time needed to get out of the box.
 		desiredHeading = (int) Utils.getHeading(position, centre);
 		while(true){
+			System.out.println("Entering heading : " + enteringHeading);
 			sailTowards(desiredHeading);
 			desiredHeading = (int) Utils.getHeading(position, centre);
 			if((System.currentTimeMillis() / 1000L) >= boxLeavingTime){
@@ -356,6 +380,7 @@ public class Boat{
 		//PART 3 : Get the hell out!
 		desiredHeading = enteringHeading;
 		while(true){
+			System.out.println("Entering heading : " + enteringHeading);
 			sailTowards(desiredHeading);
 			//TODO maybe stop when out of the box?
 			try{
@@ -409,8 +434,8 @@ public class Boat{
             int relativeWind = this.getRelativeWindDirection();
 
             //quick fix for the upside - down wind problem
-            //relativeWind +=180;
-            //if(relativeWind > 360) relativeWind -= 360;
+            relativeWind +=180;
+            if(relativeWind > 360) relativeWind -= 360;
             
             // Shamelessly stolen from Colin (for now) (yeah, for now lol)
             if(relativeWind < 180){

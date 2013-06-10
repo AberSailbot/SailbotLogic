@@ -16,7 +16,7 @@ public class RudderController{
 	double dt = 0.3; // 300ms loop time
 	double MAX = 90; // For Current Saturation
 	double MIN = -90;
-	double Kp = 1.3;
+	double Kp = 1.3; // 1.8 for simulator, 1.3 for the boat
 	double Ki = 0.05;
 	double Kd = 0.01;
 	
