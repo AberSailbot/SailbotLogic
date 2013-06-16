@@ -1,20 +1,33 @@
-package main;
+package boat;
 
 import java.io.IOException;
 
-import behavior.RudderController;
+import main.Communication;
+import main.Position;
+import main.Utils;
+import main.Waypoints;
+
 
 /**
  * @author thip
- * @author Kamil Mrowiec <kam20@aber.ac.uk> 300
+ * @author Kamil Mrowiec <kam20@aber.ac.uk> 
  * @version 1.0 (4 May 2013)
  */
-public class Boat{
+public abstract class Boat{
+
+	private static Boat instance;
 	
 	/**
 	 * How close can we sail to the wind.
 	 */
 	public static final int HOW_CLOSE = 45;
+	
+	/**
+	 * For tacking, specifies straight line distance (to desired heading),
+	 * covered in single tack cycle (in meters).
+	 */
+	public static final double TACK_DISTANCE = 20.0;
+	//TODO Make this distance proportional to waypoint distance?
 	
 	/**
 	 * How long should the boat stay inside the box (for station keeping)
@@ -23,25 +36,30 @@ public class Boat{
 	public static final int BOX_TIME = 300;
 	
 	
-	private RudderController behavior;
 	public Waypoints waypoints;
 	public Communication com;
 	private RudderController rudderController;
 	
-	private int heading;
-	private Position position;
-	private int absoluteWindDirection; 
+	/*
+	 * Current sensor data. Need to be updated (using readSensors()) 
+	 * in every loop, before adjustHeading() is called
+	 */
+	protected int heading;
+	protected Position position;
+	protected int absoluteWindDirection; 
 	
-	private double distanceToWaypoint;
-	private int waypointHeading;
 	
+	/*
+	 * Sail and rudder position that are to be sent to actuators.
+	 */
 	private int rudderPosition;
 	private int sailPosition;
 
     private long sailLastUpdated;
 
-	//For tacking:
-	private double maxDistOnSide = 10.0;
+	/*
+	 * Those variables are used to maintain tacking.
+	 */
 	private double distOnLeft, distOnRight;
 	private char currentSide = 'L'; //Left or right
 	private boolean tackingSet = false;
@@ -51,10 +69,31 @@ public class Boat{
 	
 	
 	
+	public abstract void sail();
+	
+	
+	public static Boat getInstance(){
+		return instance;
+	}
+	
+	public static void createBoat(String type, Waypoints wps){
+		if(type.equals("RaceBoat")) 
+			instance = new RaceBoat(wps);
+		else if(type.equals("StationKeepingBoat")) 
+			instance = new StationKeepingBoat(wps);
+	}
+	
+	public static void createBoat(String type){
+		if(type.equalsIgnoreCase("RaceBoat")) 
+			instance = new RaceBoat();
+		else if(type.equalsIgnoreCase("StationKeepingBoat")) 
+			instance = new StationKeepingBoat();
+	}
+	
     /**
      * Creates boat with given waypoints.
      */
-	public Boat(Waypoints wps){
+	protected Boat(Waypoints wps){
 		waypoints = wps;
 		com = new Communication();
 		rudderController = new RudderController(this);
@@ -72,68 +111,11 @@ public class Boat{
 	/**
 	 * Creates boat with no waypoints.
 	 */
-	public Boat(){
-		waypoints = new Waypoints(this);
+	protected Boat(){
+		waypoints = new Waypoints();
 		com = new Communication();
 
         position = new Position ();
-	}
-
-	public void sail(){
-		if(waypoints.isEmpty()){
-			System.out.println("No waypoints to go to.");
-			return;
-		}
-		
-		while(true){
-			
-			//STEP 1:
-			//Get sensors reading from Python controller
-			try{
-				readSensors();
-			}catch(IOException ex){
-				ex.printStackTrace();
-			}
-			
-			//STEP 2:
-			//Check if waypoint is reached. If so, go to next one.
-			
-			//Reading distance to waypoint and sending it to the Python program
-			distanceToWaypoint = waypoints.getDistanceToWaypoint();
-			
-			
-			System.out.println("Dist. to wp : " +distanceToWaypoint + ", should be less than " +Waypoints.WP_REACHED_THRESHOLD);
-			//Comparing the distance.
-			if(distanceToWaypoint < Waypoints.WP_REACHED_THRESHOLD){
-				System.out.println("Waypoint " + waypoints.getNextWaypointNumber() + " reached, moving to next one");
-				waypoints.moveToNext();
-				//Informing the Python program that waypoint has changed.
-				com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
-				com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
-				com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
-				
-				distanceToWaypoint = waypoints.getDistanceToWaypoint();
-			}
-			
-			com.sendMessage("set waypointdistance " + distanceToWaypoint);
-			waypointHeading = waypoints.getWaypointHeading();
-			com.sendMessage("set waypointheading " + waypointHeading);
-			
-			//STEP 3:
-			//Boat knows where it should go, now it just needs to go there.
-			adjustHeading(waypointHeading);		
-					
-			this.updateRudder();
-			this.updateSail();
-			
-			try{
-				Thread.sleep(300);
-			}catch(InterruptedException e){
-				e.printStackTrace(); 
-			}
-			
-		}
-				
 	}
 
 	/**
@@ -158,8 +140,8 @@ public class Boat{
 			if(!tackingSet){
 				int angle = Utils.getHeadingDifference(absoluteWindDirection-45, desiredHeading);
 				angle = Math.abs(angle);
-				distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
-				distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
+				distOnLeft = TACK_DISTANCE * Math.cos(Math.toRadians(angle));
+				distOnRight = TACK_DISTANCE * Math.sin(Math.toRadians(angle));
 				//Checking which side is favorable, i. e. closer to desired heading.
 				if(Utils.getHeadingDifference(desiredHeading, absoluteWindDirection + HOW_CLOSE)
 						< Utils.getHeadingDifference(desiredHeading, absoluteWindDirection - HOW_CLOSE)){
@@ -222,101 +204,6 @@ public class Boat{
 		updateSail();
 		
 	}
-	
-	public void keepStation(){
-		
-		//Four indices of the box in which boat must stay.
-		Position[] box = new Position[4];
-		for(int i = 0; i < 4; i++) box[i] = this.waypoints.get(i);
-		
-		//Calculating coordinates of the point in centre of the box.
-		double centreLat = (box[0].getLat() + box[3].getLat()) / 2.0;
-		double centreLon = (box[0].getLon() + box[1].getLon()) / 2.0;
-		Position centre = new Position(centreLat, centreLon);
-		
-		long currentTime = System.currentTimeMillis() / 1000L;
-		long timeWhenEnteredBox = 0, timeWhenReachedMiddle = 0;
-		
-		//PART 1. Go to the middle of the box.
-		double distanceToMiddle;
-		int desiredHeading = (int) Utils.getHeading(position, centre);
-		int enteringHeading = desiredHeading;
-		
-		while(true){
-			System.out.println("Entering heading : " + enteringHeading);
-			try{
-				readSensors();
-			}catch(IOException ex){
-				ex.printStackTrace();
-			}
-			adjustHeading(desiredHeading);
-			distanceToMiddle = Utils.getDistance(position, centre);
-			if(timeWhenEnteredBox==0){
-				if(Utils.areInOrder(box[0].getLat(),position.getLat(), box[3].getLat()) &&
-						Utils.areInOrder(box[0].getLon(), position.getLon(), box[1].getLon())){
-					//ENTERED THE BOX
-					timeWhenEnteredBox = System.currentTimeMillis() / 1000L;
-					enteringHeading = desiredHeading;
-				}
-			}
-			if(distanceToMiddle < Waypoints.WP_REACHED_THRESHOLD){
-				//REACHED THE MIDDLE
-				timeWhenReachedMiddle = System.currentTimeMillis() / 1000L;
-				//TODO that will not be accurate (10 meters threshold!)
-				break;
-			}
-			desiredHeading = (int) Utils.getHeading(position, centre);
-			try{
-				Thread.sleep(300);
-			}catch(InterruptedException ex){
-				ex.printStackTrace();
-			}
-		}
-		
-		//At that time the boat should start moving out of the box.
-		long boxLeavingTime = timeWhenEnteredBox + BOX_TIME - (timeWhenReachedMiddle - timeWhenEnteredBox);
-		
-		//PART 2 : Stay in the middle for 5 minutes - time needed to get out of the box.
-		desiredHeading = (int) Utils.getHeading(position, centre);
-		while(true){
-			System.out.println("Entering heading : " + enteringHeading);
-			try{
-				readSensors();
-			}catch(IOException ex){
-				ex.printStackTrace();
-			}
-			adjustHeading(desiredHeading);
-			desiredHeading = (int) Utils.getHeading(position, centre);
-			if((System.currentTimeMillis() / 1000L) >= boxLeavingTime){
-				//TIME TO LEAVE THE BOX
-				break;
-			}
-			try{
-				Thread.sleep(300);
-			}catch(InterruptedException ex){
-				ex.printStackTrace();
-			}
-		}
-		
-		//PART 3 : Get the hell out!
-		desiredHeading = enteringHeading;
-		while(true){
-			System.out.println("Entering heading : " + enteringHeading);
-			try{
-				readSensors();
-			}catch(IOException ex){
-				ex.printStackTrace();
-			}
-			adjustHeading(desiredHeading);
-			//TODO maybe stop when out of the box?
-			try{
-				Thread.sleep(300);
-			}catch(InterruptedException ex){
-				ex.printStackTrace();
-			}
-		}
-	}
-	
 	
 	public void readSensors() throws IOException{
 		

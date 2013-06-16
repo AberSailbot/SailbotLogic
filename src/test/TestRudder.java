@@ -3,7 +3,7 @@
  */
 package test;
 
-import main.Boat;
+import boat.Boat;
 
 /**
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
@@ -15,7 +15,8 @@ public class TestRudder{
 	 * @param args
 	 */
 	public static void main(String[] args){
-		Boat boat = new Boat();
+		Boat.createBoat("RaceBoat");
+		Boat boat = Boat.getInstance();
 		
 		for(int i = 90; i<=270; i+=10){
 			try{

@@ -1,6 +1,5 @@
-package behavior;
+package boat;
 
-import main.Boat;
 import main.Utils;
 
 /**

@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import boat.Boat;
+
 /**
  * @author thip
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
@@ -31,7 +33,7 @@ public class Main{
 		}else waypointsFile = args[1];
 		
 		File wpFile = new File(waypointsFile);
-		Waypoints wps = new Waypoints(null);
+		Waypoints wps = new Waypoints();
 		
 		try{
 			wps.readFromFile(wpFile);
@@ -44,11 +46,15 @@ public class Main{
 			return;
 		}
 		
-		Boat boat = new Boat(wps);
-		wps.setBoat(boat);
-
-		if(args[0].equalsIgnoreCase("race")) boat.sail();
-		else if(args[0].equalsIgnoreCase("station")) boat.keepStation();
-		else System.out.println("Incorrect mode parameter!");
+		if(args[0].equalsIgnoreCase("race")) Boat.createBoat("RaceBoat", wps);
+		else if(args[0].equalsIgnoreCase("station")) Boat.createBoat("StationKeepingBoat", wps);
+		else{
+			System.out.println("Incorrect mode parameter!");
+			return;
+		}
+		
+		Boat boat = Boat.getInstance();
+		boat.sail();
+		
 	}
 }
