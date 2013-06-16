@@ -119,100 +119,10 @@ public class Boat{
 			waypointHeading = waypoints.getWaypointHeading();
 			com.sendMessage("set waypointheading " + waypointHeading);
 			
-			//Printing data for testing and debugging
-			System.out.println("Position: " + position.getLat() + ", " + position.getLon());
-			System.out.println("Heading: " + this.heading);
-			System.out.println("Absolute wind: " + absoluteWindDirection);
-			System.out.println("Relative wind: " + this.getRelativeWindDirection());
-			System.out.println("Sail :" + this.sailPosition);
-			System.out.println("Rudder : " + this.rudderPosition);
-			System.out.println("Waypoint number: " + waypoints.getNextWaypointNumber());
-			System.out.println("Waypoint heading: " + waypointHeading);
-			System.out.println("Tacking: " + tackingSet);
-			System.out.println("Target heading: " + targetHeading);
-			System.out.println("Target distance: " + targetDistance);
-			
-			//Checking if course on waypoint is directly sailable. 
-			if(Math.abs(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection)) > HOW_CLOSE){
-				//If course to waypoint is sailable
-				tackingSet = false;
-				targetHeading = waypointHeading;
-				
-				//STEP 3a:
-				//Going with the wind, simply heading towards waypoint.
-				//PID algorithm calculates rudder adjustments.
-				int adjustment = rudderController.getRequiredChange(waypointHeading);
-				rudderPosition = 180 + adjustment;
-				     
-				
-			}else{
-				//If course to waypoint is not directly sailable
-				
-				//STEP 3b:
-				//Beating to windward.
-				
-				//If just started going towards the wind, tackling needs to be set up.
-				if(!tackingSet){
+			//STEP 3:
+			//Boat knows where it should go, now it just needs to go there.
+			adjustHeading(waypointHeading);		
 					
-					int angle = Utils.getHeadingDifference(absoluteWindDirection-45, waypointHeading);
-					angle = Math.abs(angle);
-					distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
-					distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
-					
-					//Checking which side is favorable, i. e. closer to waypoint heading.
-					if(Utils.getHeadingDifference(waypointHeading, absoluteWindDirection + HOW_CLOSE)
-							< Utils.getHeadingDifference(waypointHeading, absoluteWindDirection - HOW_CLOSE)){
-						//If right side is favorable
-						currentSide = 'R';
-						targetHeading = absoluteWindDirection + HOW_CLOSE;
-						if(targetHeading > 360) targetHeading -= 360;
-						
-					}else{
-						//If left side is favorable
-						currentSide = 'L';
-						targetHeading = absoluteWindDirection - HOW_CLOSE;
-						if(targetHeading < 0) targetHeading = 360 + targetHeading;
-					}
-					
-					startPoint = new Position(position.getLat(), position.getLon());
-					
-					tackingSet = true;
-				}
-				
-				currentDistance = Utils.getDistance(startPoint, position);
-				
-				if(currentSide == 'R'){
-					targetDistance = distOnRight - currentDistance;
-				}else{
-					targetDistance = distOnLeft - currentDistance;
-				}
-				com.sendMessage("set tdist " + targetDistance);
-				
-				
-				//Checking if side should be changed
-				if(currentSide == 'L' && currentDistance > distOnLeft){
-					//Switching to right side
-					currentSide = 'R';
-					startPoint = new Position(position.getLat(), position.getLon());
-					targetHeading = absoluteWindDirection + HOW_CLOSE;
-					if(targetHeading > 360) targetHeading -= 360;
-					
-				}else if(currentSide == 'R' && currentDistance > distOnRight){
-					//Switching to left side
-					currentSide = 'L';
-					startPoint = new Position(position.getLat(), position.getLon());
-					targetHeading = absoluteWindDirection - HOW_CLOSE;
-					if(targetHeading < 0) targetHeading = 360 + targetHeading;
-				}
-				
-				//Actually adjusting rudder with 
-				int adjustment = rudderController.getRequiredChange(targetHeading);
-				rudderPosition = 180 + adjustment;
-				
-				System.out.println("DistOnLeft : " + distOnLeft + " , DistOnRight: " + distOnRight);
-			}
-			
-			
 			this.updateRudder();
 			this.updateSail();
 			
@@ -226,14 +136,15 @@ public class Boat{
 				
 	}
 
-	
-	public void sailTowards(int desiredHeading){
-		try{
-			readSensors();
-		}catch(IOException ex){
-			ex.printStackTrace();
-		}
-		//Checking if course on waypoint is directly sailable. 
+	/**
+	 * Calculates sail and rudder positions required to keep the boat on desired heading.
+	 * This method sends the actual commands to sail winch and rudder servo.
+	 * Must be called in a loop (with timer, not continuously), after reading sensors.
+	 * 
+	 * @param desiredHeading
+	 */
+	public void adjustHeading(int desiredHeading){
+		//Checking if desired course is directly sailable. 
 		if(Math.abs(Utils.getHeadingDifference(desiredHeading, absoluteWindDirection)) > HOW_CLOSE){
 			//If course to waypoint is sailable
 			tackingSet = false;
@@ -243,13 +154,13 @@ public class Boat{
 		}else{
 			//If course to waypoint is not directly sailable
 					
-			//If just started going towards the wind, tackling needs to be set up.
+			//If just started going towards the wind, tacking needs to be set up.
 			if(!tackingSet){
 				int angle = Utils.getHeadingDifference(absoluteWindDirection-45, desiredHeading);
 				angle = Math.abs(angle);
 				distOnLeft = maxDistOnSide * Math.cos(Math.toRadians(angle));
 				distOnRight = maxDistOnSide * Math.sin(Math.toRadians(angle));
-				//Checking which side is favorable, i. e. closer to waypoint heading.
+				//Checking which side is favorable, i. e. closer to desired heading.
 				if(Utils.getHeadingDifference(desiredHeading, absoluteWindDirection + HOW_CLOSE)
 						< Utils.getHeadingDifference(desiredHeading, absoluteWindDirection - HOW_CLOSE)){
 					//If right side is favorable
@@ -291,7 +202,7 @@ public class Boat{
 				targetHeading = absoluteWindDirection - HOW_CLOSE;
 				if(targetHeading < 0) targetHeading = 360 + targetHeading;
 			}
-			//Actually adjusting rudder with 
+			//Actually adjusting rudder 
 			int adjustment = rudderController.getRequiredChange(targetHeading);
 			rudderPosition = 180 + adjustment;
 		}
@@ -306,10 +217,10 @@ public class Boat{
 		System.out.println("Target heading: " + targetHeading);
 		System.out.println("Target distance: " + targetDistance);
 		System.out.println("Desired heading: " + desiredHeading);
+
+		updateRudder();
+		updateSail();
 		
-		//Sending commands to actuators.
-		this.updateRudder();
-		this.updateSail();
 	}
 	
 	public void keepStation(){
@@ -333,7 +244,12 @@ public class Boat{
 		
 		while(true){
 			System.out.println("Entering heading : " + enteringHeading);
-			sailTowards(desiredHeading);
+			try{
+				readSensors();
+			}catch(IOException ex){
+				ex.printStackTrace();
+			}
+			adjustHeading(desiredHeading);
 			distanceToMiddle = Utils.getDistance(position, centre);
 			if(timeWhenEnteredBox==0){
 				if(Utils.areInOrder(box[0].getLat(),position.getLat(), box[3].getLat()) &&
@@ -364,7 +280,12 @@ public class Boat{
 		desiredHeading = (int) Utils.getHeading(position, centre);
 		while(true){
 			System.out.println("Entering heading : " + enteringHeading);
-			sailTowards(desiredHeading);
+			try{
+				readSensors();
+			}catch(IOException ex){
+				ex.printStackTrace();
+			}
+			adjustHeading(desiredHeading);
 			desiredHeading = (int) Utils.getHeading(position, centre);
 			if((System.currentTimeMillis() / 1000L) >= boxLeavingTime){
 				//TIME TO LEAVE THE BOX
@@ -381,7 +302,12 @@ public class Boat{
 		desiredHeading = enteringHeading;
 		while(true){
 			System.out.println("Entering heading : " + enteringHeading);
-			sailTowards(desiredHeading);
+			try{
+				readSensors();
+			}catch(IOException ex){
+				ex.printStackTrace();
+			}
+			adjustHeading(desiredHeading);
 			//TODO maybe stop when out of the box?
 			try{
 				Thread.sleep(300);
