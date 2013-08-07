@@ -68,7 +68,9 @@ public abstract class Boat{
 	double currentDistance, targetDistance;
 	
 	
-	
+	/**
+	 * Contains main loop for sailing logic.
+	 */
 	public abstract void sail();
 	
 	
@@ -246,6 +248,10 @@ public abstract class Boat{
         //    sailLastUpdated = currentTime;
             int relativeWind = this.getRelativeWindDirection();
 
+            //On the boat:
+            // Sail 0 = fully out
+            // Sail 90 = fully in
+            // ...or is it?
             //quick fix for the upside - down wind problem
             relativeWind +=180;
             if(relativeWind > 360) relativeWind -= 360;
@@ -287,7 +293,7 @@ public abstract class Boat{
 	public int getRelativeWindDirection(){
 		int dir = this.absoluteWindDirection - this.heading;
 		if(dir < 0) dir = 360 + dir;
-		return dir; //TODO Make sure that is always correct?
+		return dir; 
 	}
 	
 	public int getHeading(){

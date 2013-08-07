@@ -27,7 +27,7 @@ public class Main{
 		}
 		
 		String waypointsFile;
-		if(args[1]==null){
+		if(args.length < 2){
 			System.out.println("Waypoints file not specified, using default : waypoints.txt");
 			waypointsFile = "waypoints.txt";
 		}else waypointsFile = args[1];
