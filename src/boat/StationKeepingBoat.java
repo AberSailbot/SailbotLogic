@@ -2,8 +2,9 @@ package boat;
 
 import java.io.IOException;
 
+import utils.Utils;
+
 import main.Position;
-import main.Utils;
 import main.Waypoints;
 
 /**
@@ -12,12 +13,14 @@ import main.Waypoints;
  */
 public class StationKeepingBoat extends Boat{
 
+	/**
+	 * How long should the boat stay inside the box (for station keeping)
+	 * (in seconds, originally 5 minutes - 300 seconds);
+	 */
+	public static int BOX_TIME = 300;
+	
 	public StationKeepingBoat(){
 		super();
-	}
-
-	public StationKeepingBoat(Waypoints wps){
-		super(wps);
 	}
 
 	@Override
@@ -46,7 +49,7 @@ public class StationKeepingBoat extends Boat{
 			}catch(IOException ex){
 				ex.printStackTrace();
 			}
-			adjustHeading(desiredHeading);
+			keepHeading(desiredHeading);
 			distanceToMiddle = Utils.getDistance(position, centre);
 			if(timeWhenEnteredBox == 0){
 				if(Utils.areInOrder(box[0].getLat(), position.getLat(),
@@ -86,7 +89,7 @@ public class StationKeepingBoat extends Boat{
 			}catch(IOException ex){
 				ex.printStackTrace();
 			}
-			adjustHeading(desiredHeading);
+			keepHeading(desiredHeading);
 			desiredHeading = (int) Utils.getHeading(position, centre);
 			if((System.currentTimeMillis() / 1000L) >= boxLeavingTime){
 				// TIME TO LEAVE THE BOX
@@ -108,7 +111,7 @@ public class StationKeepingBoat extends Boat{
 			}catch(IOException ex){
 				ex.printStackTrace();
 			}
-			adjustHeading(desiredHeading);
+			keepHeading(desiredHeading);
 			// TODO maybe stop when out of the box?
 			try{
 				Thread.sleep(300);

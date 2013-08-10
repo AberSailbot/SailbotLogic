@@ -25,19 +25,22 @@ public class RaceBoat extends Boat{
 		super();
 	}
 
-	public RaceBoat(Waypoints wps){
-		super(wps);
-	}
 
 	@Override
 	public void sail(){
-		if(waypoints.isEmpty()){
-			System.out.println("No waypoints to go to.");
-			return;
-		}
+		
 
 		while(true){
-
+			if(waypoints.isEmpty()){
+				System.out.println("No waypoints to go to...");
+				try{
+					Thread.sleep(3000);
+				}catch(InterruptedException ex){
+					ex.printStackTrace();
+				}
+				continue;
+			}
+			
 			// STEP 1:
 			// Get sensors reading from Python controller
 			try{
@@ -79,7 +82,7 @@ public class RaceBoat extends Boat{
 			
 			// STEP 3:
 			// Boat knows where it should go, now it just needs to go there.
-			adjustHeading(waypointHeading);
+			keepHeading(waypointHeading);
 
 			this.updateRudder();
 			this.updateSail();

@@ -2,9 +2,11 @@ package boat;
 
 import java.io.IOException;
 
+import utils.Config;
+import utils.Utils;
+
 import main.Communication;
 import main.Position;
-import main.Utils;
 import main.Waypoints;
 
 
@@ -20,21 +22,14 @@ public abstract class Boat{
 	/**
 	 * How close can we sail to the wind.
 	 */
-	public static final int HOW_CLOSE = 45;
+	public static int HOW_CLOSE = 45;
 	
 	/**
 	 * For tacking, specifies straight line distance (to desired heading),
 	 * covered in single tack cycle (in meters).
 	 */
-	public static final double TACK_DISTANCE = 20.0;
+	public static double TACK_DISTANCE = 20.0;
 	//TODO Make this distance proportional to waypoint distance?
-	
-	/**
-	 * How long should the boat stay inside the box (for station keeping)
-	 * (in seconds, originally 5 minutes - 300 seconds);
-	 */
-	public static final int BOX_TIME = 300;
-	
 	
 	public Waypoints waypoints;
 	public Communication com;
@@ -52,10 +47,10 @@ public abstract class Boat{
 	/*
 	 * Sail and rudder position that are to be sent to actuators.
 	 */
-	private int rudderPosition;
-	private int sailPosition;
+	private int rudderPosition = 180;
+	private int sailPosition = 90;
 
-    private long sailLastUpdated;
+//    private long sailLastUpdated;
 
 	/*
 	 * Those variables are used to maintain tacking.
@@ -78,46 +73,25 @@ public abstract class Boat{
 		return instance;
 	}
 	
-	public static void createBoat(String type, Waypoints wps){
-		if(type.equals("RaceBoat")) 
-			instance = new RaceBoat(wps);
-		else if(type.equals("StationKeepingBoat")) 
-			instance = new StationKeepingBoat(wps);
-	}
-	
 	public static void createBoat(String type){
 		if(type.equalsIgnoreCase("RaceBoat")) 
 			instance = new RaceBoat();
 		else if(type.equalsIgnoreCase("StationKeepingBoat")) 
 			instance = new StationKeepingBoat();
 	}
-	
-    /**
-     * Creates boat with given waypoints.
-     */
-	protected Boat(Waypoints wps){
-		waypoints = wps;
-		com = new Communication();
-		rudderController = new RudderController(this);
-
-        position = new Position ();
-        rudderPosition = 180;
-        updateRudder();
-        
-        //Informing the Python program that waypoint has changed.
-		com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
-		com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
-		com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
-	}
 
 	/**
-	 * Creates boat with no waypoints.
+	 * Creates a new boat.
 	 */
 	protected Boat(){
+		HOW_CLOSE = Config.getInt("howCloseToTheWind");
+		TACK_DISTANCE = Config.getDouble("tackChangeDistance");
+		
 		waypoints = new Waypoints();
 		com = new Communication();
-
         position = new Position ();
+        rudderController = new RudderController();
+        updateRudder();
 	}
 
 	/**
@@ -127,13 +101,13 @@ public abstract class Boat{
 	 * 
 	 * @param desiredHeading
 	 */
-	public void adjustHeading(int desiredHeading){
+	public void keepHeading(int desiredHeading){
 		//Checking if desired course is directly sailable. 
 		if(Math.abs(Utils.getHeadingDifference(desiredHeading, absoluteWindDirection)) > HOW_CLOSE){
 			//If course to waypoint is sailable
 			tackingSet = false;
 			targetHeading = desiredHeading;
-			int adjustment = rudderController.getRequiredChange(desiredHeading);
+			int adjustment = rudderController.getRequiredChange(this.heading, desiredHeading);
 			rudderPosition = 180 + adjustment;
 		}else{
 			//If course to waypoint is not directly sailable
@@ -187,7 +161,7 @@ public abstract class Boat{
 				if(targetHeading < 0) targetHeading = 360 + targetHeading;
 			}
 			//Actually adjusting rudder 
-			int adjustment = rudderController.getRequiredChange(targetHeading);
+			int adjustment = rudderController.getRequiredChange(this.heading, targetHeading);
 			rudderPosition = 180 + adjustment;
 		}
 		
@@ -209,24 +183,36 @@ public abstract class Boat{
 	
 	public void readSensors() throws IOException{
 		
-		// Getting GPS location
-		com.sendMessage("get easting");
-		double easting = Double.parseDouble(com.readMessage());
-		
-		com.sendMessage("get northing");
-		double northing = Math.abs(Double.parseDouble(com.readMessage()));
+		try{
+			// Getting GPS location
+			com.sendMessage("get easting");
+			double easting = Double.parseDouble(com.readMessage());
+			
+			com.sendMessage("get northing");
+			double northing = Math.abs(Double.parseDouble(com.readMessage()));
 
-		position.set(easting, northing);
-		
-		//Getting compass and wind sensors readings
-		com.sendMessage("get compass");
-		heading = Integer.parseInt(com.readMessage());
+			position.set(easting, northing);
+			
+			//Getting compass and wind sensors readings
+			com.sendMessage("get compass");
+			heading = Integer.parseInt(com.readMessage());
 
-		//Python code sends absolute wind direction.
-		com.sendMessage("get wind_dir");
-		absoluteWindDirection = Integer.parseInt(com.readMessage()); //- heading;
-		//if(absoluteWindDirection < 0) absoluteWindDirection = 360 + absoluteWindDirection;
-		
+			//Python code sends absolute wind direction.
+			com.sendMessage("get wind_dir");
+			absoluteWindDirection = Integer.parseInt(com.readMessage()); 
+		}catch(NumberFormatException ex){
+			System.out.println("\nCannot receive sensor data.");
+			System.out.print("Retry in ");
+			for(int i = 5; i > 0; i--){
+				System.out.print(i +", ");
+				try{
+					Thread.sleep(1000);
+//					readSensors();
+				}catch(InterruptedException ex1){
+					ex1.printStackTrace();
+				}
+			}
+		}
 	}
 
 
@@ -306,5 +292,20 @@ public abstract class Boat{
 
 	public Position getNextWayPoint(){
 		return waypoints.getNextWaypoint();
+	}
+
+
+	public Waypoints getWaypoints(){
+		return waypoints;
+	}
+
+
+	public void setWaypoints(Waypoints waypoints){
+		this.waypoints = waypoints;
+		
+		//Tell python program that waypoints has changed.
+		com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
+		com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
+		com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
 	}
 }

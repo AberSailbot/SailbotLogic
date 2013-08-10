@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
+import utils.Utils;
+
 import boat.Boat;
 
 /**

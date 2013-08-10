@@ -1,7 +1,7 @@
 package test;
 
+import utils.Utils;
 import main.Position;
-import main.Utils;
 
 /**
  * @author thip

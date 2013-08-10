@@ -17,16 +17,20 @@ public class Communication{
 	BufferedReader receive;
 
 	public Communication(){
-		try{
-			socket = new Socket("localhost", 5555); //10006);
-			transmit = new PrintWriter(socket.getOutputStream(), true);
-			receive = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
-			socket.setSoTimeout(50); //TODO Is that enough?
-
-		}catch(Exception ex){
-			ex.printStackTrace();
-		}
+		
+			try{
+				socket = new Socket("localhost", 5555);
+				transmit = new PrintWriter(socket.getOutputStream(), true);
+				receive = new BufferedReader(new InputStreamReader(
+						socket.getInputStream()));
+				socket.setSoTimeout(100); //TODO Is that reasonable?
+			}catch(UnknownHostException | SocketException ex){
+				System.out.println("Error : Cannot initialize socket connection.");
+				System.exit(0);
+			}catch(IOException ex){
+				ex.printStackTrace();
+				System.exit(0);
+			}
 	}
 
 	public void sendMessage(String message){

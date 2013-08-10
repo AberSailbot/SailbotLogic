@@ -1,7 +1,9 @@
 /**
  * 
  */
-package main;
+package utils;
+
+import main.Position;
 
 /**
  * Contains methods that can be utilized in many places in the program.
