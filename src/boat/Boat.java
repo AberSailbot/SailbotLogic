@@ -16,6 +16,9 @@ import main.Waypoints;
  * @version 1.0 (4 May 2013)
  */
 public abstract class Boat{
+	
+	public static final String RACE_MODE = "race";
+	public static final String STATION_KEEPING_MODE = "stationkeeping";
 
 	private static Boat instance;
 	
@@ -74,10 +77,22 @@ public abstract class Boat{
 	}
 	
 	public static void createBoat(String type){
-		if(type.equalsIgnoreCase("RaceBoat")) 
+		
+		switch(type){
+		case RACE_MODE:
 			instance = new RaceBoat();
-		else if(type.equalsIgnoreCase("StationKeepingBoat")) 
+			break;
+		case STATION_KEEPING_MODE:
 			instance = new StationKeepingBoat();
+			break;
+		default:
+			System.out.println("Cannot set boat mode : unknown mode " + type);
+			if(instance == null){
+				System.out.println("Program will quit now.");
+				System.exit(0);
+			}
+		}
+		
 	}
 
 	/**
@@ -184,22 +199,12 @@ public abstract class Boat{
 	public void readSensors() throws IOException{
 		
 		try{
-			// Getting GPS location
-			com.sendMessage("get easting");
-			double easting = Double.parseDouble(com.readMessage());
+			com.requestData(Communication.LATTITUDE);
+			com.requestData(Communication.LONGITUDE);
+			com.requestData(Communication.HEADING);
+			com.requestData(Communication.ABSOLUTE_WIND);
+			com.readMessage();
 			
-			com.sendMessage("get northing");
-			double northing = Math.abs(Double.parseDouble(com.readMessage()));
-
-			position.set(easting, northing);
-			
-			//Getting compass and wind sensors readings
-			com.sendMessage("get compass");
-			heading = Integer.parseInt(com.readMessage());
-
-			//Python code sends absolute wind direction.
-			com.sendMessage("get wind_dir");
-			absoluteWindDirection = Integer.parseInt(com.readMessage()); 
 		}catch(NumberFormatException ex){
 			System.out.println("\nCannot receive sensor data.");
 			System.out.print("Retry in ");
@@ -307,5 +312,25 @@ public abstract class Boat{
 		com.sendMessage("set waypointnum " + waypoints.getNextWaypointNumber());
 		com.sendMessage("set waypointnorthing " + waypoints.getNextWaypoint().getLat() );
 		com.sendMessage("set waypointeasting " + waypoints.getNextWaypoint().getLon());
+	}
+
+
+	public int getAbsoluteWindDirection(){
+		return absoluteWindDirection;
+	}
+
+
+	public void setAbsoluteWindDirection(int absoluteWindDirection){
+		this.absoluteWindDirection = absoluteWindDirection;
+	}
+
+
+	public void setHeading(int heading){
+		this.heading = heading;
+	}
+
+
+	public void setPosition(Position position){
+		this.position = position;
 	}
 }

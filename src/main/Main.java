@@ -22,26 +22,20 @@ public class Main{
 		if(args==null || args.length<1){
 			System.out.println("Missing parameters!");
 			System.out.println("parameter 1 : mode of operation");
-			System.out.println("Those are 'race' or 'station'");
-			System.out.println("parameter 2 : name of waypoints file");
+			System.out.println("Those are : " + Boat.RACE_MODE + ", " + Boat.STATION_KEEPING_MODE);
+			System.out.println("parameter 2 : name of waypoints file (optional)");
 		}
 		
 		try{
 			Config.init();
 		}catch(IOException ex1){
-			System.out.println("Cannot load config. Program will return.");
+			System.out.println("Cannot load config. Program will quit now.");
 			ex1.printStackTrace();
 			return;
 		}
 		
-		if(args[0].equalsIgnoreCase("race")) Boat.createBoat("RaceBoat");
-		else if(args[0].equalsIgnoreCase("station")) Boat.createBoat("StationKeepingBoat");
-		else{
-			System.out.println("Incorrect mode parameter!");
-			return;
-		}
+		Boat.createBoat(args[0]);
 		
-		String wpFileName;
 		if(args.length < 2){
 			System.out.println("Waypoints file not specified. No waypoints loaded.");
 		}else{
