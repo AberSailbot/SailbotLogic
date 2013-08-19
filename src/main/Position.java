@@ -15,6 +15,11 @@ public class Position{
 		this.lon = lon;
 	}
 	
+	public Position(String lat, String lon){
+		this.lat = Double.parseDouble(lat);
+		this.lon = Double.parseDouble(lon);
+	}
+	
 	public Position(){
 		
 	}

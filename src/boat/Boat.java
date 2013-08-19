@@ -1,13 +1,14 @@
 package boat;
 
 import java.io.IOException;
-
-import utils.Config;
-import utils.Utils;
+import java.util.List;
 
 import main.Communication;
+import main.Obstacle;
 import main.Position;
 import main.Waypoints;
+import utils.Config;
+import utils.Utils;
 
 
 /**
@@ -37,6 +38,12 @@ public abstract class Boat{
 	public Waypoints waypoints;
 	public Communication com;
 	private RudderController rudderController;
+	
+	/**
+	 * Contains information about known obstacles.
+	 * Updated every time "set obstacles" command is read.
+	 */
+	protected List<Obstacle> obstacles;
 	
 	/*
 	 * Current sensor data. Need to be updated (using readSensors()) 
@@ -332,5 +339,15 @@ public abstract class Boat{
 
 	public void setPosition(Position position){
 		this.position = position;
+	}
+
+
+	public List<Obstacle> getObstacles(){
+		return obstacles;
+	}
+
+
+	public void setObstacles(List<Obstacle> obstacles){
+		this.obstacles = obstacles;
 	}
 }
