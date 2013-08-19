@@ -20,7 +20,7 @@ import boat.Boat;
 public class Communication{
 	
 	public static final String HEADING = "compass";
-	public static final String LATTITUDE = "northing";
+	public static final String LATITUDE = "northing";
 	public static final String LONGITUDE = "easting";
 	public static final String ABSOLUTE_WIND = "wind_dir";
 	
@@ -85,7 +85,7 @@ public class Communication{
 				case HEADING:
 					Boat.getInstance().setHeading(Integer.parseInt(parts[2]));
 					break;
-				case LATTITUDE:
+				case LATITUDE:
 					Boat.getInstance().getPosition().setLat(Double.parseDouble(parts[2]));
 					break;
 				case LONGITUDE:

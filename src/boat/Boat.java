@@ -199,7 +199,7 @@ public abstract class Boat{
 	public void readSensors() throws IOException{
 		
 		try{
-			com.requestData(Communication.LATTITUDE);
+			com.requestData(Communication.LATITUDE);
 			com.requestData(Communication.LONGITUDE);
 			com.requestData(Communication.HEADING);
 			com.requestData(Communication.ABSOLUTE_WIND);
