@@ -4,7 +4,7 @@ import utils.Config;
 import utils.Utils;
 
 /**
- * @author thip
+ * @author David Capper <dmc2@aber.ac.uk>
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
  * @version 1.0 (4 May 2013)
  */
