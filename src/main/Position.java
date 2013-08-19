@@ -2,7 +2,7 @@ package main;
 import static java.lang.Math.*;
 
 /**
- * @author thip
+ * @author David Capper <dmc2@aber.ac.uk>
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
  * @version 1.0 (4 May 2013)
  */
