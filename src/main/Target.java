@@ -17,9 +17,9 @@ public class Target {
         position = new Position(0,0);
     }
 
-    int getHeading(){return this.heading;}
-    int getVelocity(){return this.velocity;}
-    Position getPosition(){return this.position;}
+    public int getHeading(){return this.heading;}
+    public int getVelocity(){return this.velocity;}
+    public Position getPosition(){return this.position;}
 
     public void updateState(){}
 }
