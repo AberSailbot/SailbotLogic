@@ -226,6 +226,23 @@ public abstract class Boat{
 			}
 		}
 	}
+	
+	/**
+	 * If waypoints are available, goes to sail() method,
+	 * otherwise asks for waypoints and waits until it gets them.
+	 */
+	public void startSailing(){
+		while(waypoints.isEmpty()){
+			System.out.println("No waypoints to go to...");
+			com.requestData("waypoints");
+			try{
+				Thread.sleep(1500);
+			}catch(InterruptedException ex){
+				ex.printStackTrace();
+			}
+		}
+		sail();
+	}
 
 
 	/**

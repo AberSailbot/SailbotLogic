@@ -52,7 +52,7 @@ public class Main{
 			}
 		}
 		
-		Boat.getInstance().sail();
+		Boat.getInstance().startSailing();
 		
 	}
 }

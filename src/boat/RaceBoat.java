@@ -31,16 +31,7 @@ public class RaceBoat extends Boat{
 		
 
 		while(true){
-			if(waypoints.isEmpty()){
-				System.out.println("No waypoints to go to...");
-				try{
-					Thread.sleep(3000);
-				}catch(InterruptedException ex){
-					ex.printStackTrace();
-				}
-				continue;
-			}
-			
+
 			// STEP 1:
 			// Get sensors reading from Python controller
 			try{

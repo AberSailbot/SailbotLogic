@@ -52,6 +52,7 @@ public class Communication{
 	public void requestData(String data){
 		transmit.println("get " + data);
 		transmit.flush();
+		this.readMessage();
 	}
 	
 	public void sendMessage(String message){
@@ -96,7 +97,7 @@ public class Communication{
 					Boat.getInstance().setAbsoluteWindDirection(Integer.parseInt(parts[2]));
 					break;
 				case WAYPOINTS:
-					this.updateWaypoints(parts[2]);
+					this.updateWaypoints(message);
 					break;
 				case OPERATION_MODE:
 					Boat.createBoat(parts[2]);
@@ -123,7 +124,9 @@ public class Communication{
 	 */
 	private void updateWaypoints(String wps){
 		LinkedList<Position> points = new LinkedList<Position>();
+		wps.replace("set waypoints ", ""); //remove beginning of the message
 		String[] tokens = wps.split(" ");
+		System.out.println("Received " + tokens.length + " wayponts!");
 		for(String token : tokens){
 			String[] waypoint = token.split(";");
 			if(waypoint !=null && waypoint.length == 2){
