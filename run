@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 cd bin
 java main.Main race

@@ -45,7 +45,7 @@ public class Waypoints{
 	
 	public Position getNextWaypoint(){
 		if(points.size() <= nextWaypointNumber || nextWaypointNumber<0) 
-			nextWaypointNumber = 0;
+			return points.getLast();
 		return points.get(nextWaypointNumber);
 	}
 	
@@ -65,8 +65,8 @@ public class Waypoints{
 			System.out.println("WP number now: " + nextWaypointNumber);
 			return true;
 		}else{
-			System.out.println("Setting WP number to 0");
-			nextWaypointNumber = 0;
+			//System.out.println("Setting WP number to 0");
+			//nextWaypointNumber = 0;
 			return false;
 		}
 	}
