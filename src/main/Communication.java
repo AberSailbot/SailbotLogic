@@ -25,6 +25,7 @@ public class Communication{
 	public static final String ABSOLUTE_WIND = "wind_dir";
 	
 	public static final String WAYPOINTS = "waypoints";
+	public static final String WAYPOINT = "waypoint";
 	public static final String OPERATION_MODE = "mode";
 	public static final String OBSTACLES = "obstacles";
 	
@@ -98,6 +99,9 @@ public class Communication{
 					break;
 				case WAYPOINTS:
 					this.updateWaypoints(message);
+					break;
+				case WAYPOINT:
+					Boat.getInstance().getWaypoints().setNextWaypointNumber(Integer.parseInt(parts[2]));
 					break;
 				case OPERATION_MODE:
 					Boat.createBoat(parts[2]);

@@ -66,7 +66,18 @@ public class Waypoints{
 			return true;
 		}else{
 			//System.out.println("Setting WP number to 0");
-			//nextWaypointNumber = 0;
+			//scp nextWaypointNumber = 0;
+			return false;
+		}
+	}
+	
+	public boolean goToWaypoint(int wpNumber){
+		System.out.println("Changing waypoint number");
+		if(wpNumber >= 0 && wpNumber < points.size()){
+			nextWaypointNumber = wpNumber;
+			System.out.println("WP number now: " + wpNumber);
+			return true;
+		}else{
 			return false;
 		}
 	}
