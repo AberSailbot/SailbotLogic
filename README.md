@@ -20,6 +20,7 @@ To start the program, go to bin directory and run main.Main class, with waypoint
 Before starting SailbotManager, ensure that either tracksailAI simulator or Python emulator is running.
 
 >cd bin
+
 >java main.Main waypoints.txt
 
 =======
