@@ -1,7 +1,9 @@
 /**
  * 
  */
-package main;
+package utils;
+
+import main.Position;
 
 /**
  * Contains methods that can be utilized in many places in the program.
@@ -69,6 +71,12 @@ public class Utils{
 		double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
 				* Math.cos(lat2) * Math.cos(longDiff);
 		return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+	}
+	
+	public static boolean areInOrder(Double a, Double b, Double c){
+		if(b > a && c > b) return true;
+		if(b < a && c < b) return true;
+		return false;
 	}
 	
 }
