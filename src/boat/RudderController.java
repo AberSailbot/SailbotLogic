@@ -1,22 +1,20 @@
-package behavior;
+package boat;
 
-import main.Boat;
-import main.Utils;
+import utils.Config;
+import utils.Utils;
 
 /**
- * @author thip
+ * @author David Capper <dmc2@aber.ac.uk>
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
  * @version 1.0 (4 May 2013)
  */
 public class RudderController{
 
-	protected Boat boat;
-	
 	int epsilon = 2; 
 	double dt = 0.3; // 300ms loop time
 	double MAX = 90; // For Current Saturation
 	double MIN = -90;
-	double Kp = 1.3;
+	double Kp = 1.3; // 1.8 for simulator, 1.3 for the boat
 	double Ki = 0.05;
 	double Kd = 0.01;
 	
@@ -25,8 +23,14 @@ public class RudderController{
 	double integral = 0;
 	
 
-	public RudderController(Boat boat){
-		this.boat = boat;
+	public RudderController(){
+		this.Kp = Config.getDouble("Kp");
+		this.Ki = Config.getDouble("Ki");
+		this.Kd = Config.getDouble("Kd");
+		this.dt = Config.getDouble("dt");
+		this.epsilon = Config.getInt("epsilon");
+		this.MIN = Config.getDouble("MIN");
+		this.MAX = Config.getDouble("MAX");
 	}
 
 	
@@ -35,7 +39,7 @@ public class RudderController{
 	 * @param desiredHeading
 	 * @return
 	 */
-	public int getRequiredChange(int desiredHeading){
+	public int getRequiredChange(int currentHeading, int desiredHeading){
 
 		double error;
 		double derivative;
@@ -50,7 +54,7 @@ public class RudderController{
 
 		// Caculate P,I,D
 		//error = desiredHeading - boat.getHeading();
-		error = Utils.getHeadingDifference(boat.getHeading(), desiredHeading);
+		error = Utils.getHeadingDifference(currentHeading, desiredHeading);
 		// In case of error too small then stop intergration
 		if(Math.abs(error) > epsilon){
 			integral = integral + error * dt;

@@ -2,7 +2,7 @@ package main;
 import static java.lang.Math.*;
 
 /**
- * @author thip
+ * @author David Capper <dmc2@aber.ac.uk>
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
  * @version 1.0 (4 May 2013)
  */
@@ -13,6 +13,11 @@ public class Position{
 	public Position(double lat, double lon){
 		this.lat = lat;
 		this.lon = lon;
+	}
+	
+	public Position(String lat, String lon){
+		this.lat = Double.parseDouble(lat);
+		this.lon = Double.parseDouble(lon);
 	}
 	
 	public Position(){

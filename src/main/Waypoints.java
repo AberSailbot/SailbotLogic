@@ -14,6 +14,11 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
+import utils.Config;
+import utils.Utils;
+
+import boat.Boat;
+
 /**
  * Manages waypoints. Similar to what is used in the telemetry program.
  * @author Kamil Mrowiec <kam20@aber.ac.uk>
@@ -24,15 +29,18 @@ public class Waypoints{
 	/**
 	 * Defines how close the boat needs to get to a waypoint.
 	 */
-	public static final int WP_REACHED_THRESHOLD = 10;
-	
-	Boat boat;
+	public static int WP_REACHED_THRESHOLD = 10;
 	
 	LinkedList<Position> points = new LinkedList<Position>();
 	int nextWaypointNumber = 0;
 	
-	public Waypoints(Boat boat){
-		this.boat = boat;
+	public Waypoints(){
+		WP_REACHED_THRESHOLD = Config.getInt("howCloseToWaypoint");
+	}
+	
+	public Waypoints(LinkedList<Position> points){
+		this();
+		this.points = points;
 	}
 	
 	public Position getNextWaypoint(){
@@ -42,11 +50,11 @@ public class Waypoints{
 	}
 	
 	public int getWaypointHeading(){
-		return (int) Utils.getHeading(boat.getPosition(), getNextWaypoint());
+		return (int) Utils.getHeading(Boat.getInstance().getPosition(), getNextWaypoint());
 	}
 	
 	public double getDistanceToWaypoint(){
-		return Utils.getDistance(boat.getPosition(), getNextWaypoint());
+		return Utils.getDistance(Boat.getInstance().getPosition(), getNextWaypoint());
 	}
 	
 	public boolean moveToNext(){
@@ -126,16 +134,9 @@ public class Waypoints{
 		return points.isEmpty();
 	}
 
-	public Boat getBoat(){
-		return boat;
+	public Position get(int index){
+		return points.get(index);
 	}
-
-	public void setBoat(Boat boat){
-		this.boat = boat;
-	}
-	
-	
-	
-	
+		
 	
 }
