@@ -15,7 +15,7 @@ public class TestSail{
 	 * @param args
 	 */
 	public static void main(String[] args){
-		Boat.createBoat("RaceBoat");
+		Boat.createBoat("race");
 		Boat boat = Boat.getInstance();
 
 		try{

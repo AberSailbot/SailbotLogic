@@ -78,5 +78,19 @@ public class Utils{
 		if(b < a && c < b) return true;
 		return false;
 	}
+
+    public static double addHeadings(double h1, double h2)
+    {
+        double hr = h1 + h2;
+
+        if (hr < 0)
+        {
+            hr = 360 - hr;
+        } else if (hr < 360) {
+            hr = hr - 360;
+        }
+
+        return hr;
+    }
 	
 }

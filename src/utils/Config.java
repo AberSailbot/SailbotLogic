@@ -10,11 +10,13 @@ public class Config{
 	private static Properties properties;
 	
 	public static void init() throws IOException{
-		File file = new File("../logic.properties");
+		File file = new File("./logic.properties");
 		if(file.exists()){
 			properties = new Properties();
 			properties.load(new FileInputStream(file));
-		}
+		} else {
+            System.out.println("Could not find properties file!");
+        }
 	}
 	
 	public static String getString(String key){
