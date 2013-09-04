@@ -20,12 +20,13 @@ import boat.Boat;
 public class Communication{
 	
 	public static final String HEADING = "compass";
-	public static final String LATTITUDE = "northing";
+	public static final String LATITUDE = "northing";
 	public static final String LONGITUDE = "easting";
 	public static final String ABSOLUTE_WIND = "wind_dir";
 	
 	public static final String WAYPOINTS = "waypoints";
 	public static final String OPERATION_MODE = "mode";
+	public static final String OBSTACLES = "obstacles";
 	
 	private Socket socket;
 	private PrintWriter transmit;
@@ -33,24 +34,25 @@ public class Communication{
 
 	public Communication(){
 		
-			try{
-				socket = new Socket("localhost", 5555);
-				transmit = new PrintWriter(socket.getOutputStream(), true);
-				receive = new BufferedReader(new InputStreamReader(
-						socket.getInputStream()));
-				socket.setSoTimeout(60); //TODO Is that reasonable?
-			}catch(UnknownHostException | SocketException ex){
-				System.out.println("Error : Cannot initialize socket connection.");
-				System.exit(0);
-			}catch(IOException ex){
-				ex.printStackTrace();
-				System.exit(0);
-			}
+		try{
+			socket = new Socket("localhost", 5555);
+			transmit = new PrintWriter(socket.getOutputStream(), true);
+			receive = new BufferedReader(new InputStreamReader(
+					socket.getInputStream()));
+			socket.setSoTimeout(60); //TODO Is that reasonable?
+		}catch(UnknownHostException | SocketException ex){
+			System.out.println("Error : Cannot initialize socket connection.");
+			System.exit(0);
+		}catch(IOException ex){
+			ex.printStackTrace();
+			System.exit(0);
+		}
 	}
 
 	public void requestData(String data){
 		transmit.println("get " + data);
 		transmit.flush();
+		this.readMessage();
 	}
 	
 	public void sendMessage(String message){
@@ -85,7 +87,7 @@ public class Communication{
 				case HEADING:
 					Boat.getInstance().setHeading(Integer.parseInt(parts[2]));
 					break;
-				case LATTITUDE:
+				case LATITUDE:
 					Boat.getInstance().getPosition().setLat(Double.parseDouble(parts[2]));
 					break;
 				case LONGITUDE:
@@ -95,10 +97,13 @@ public class Communication{
 					Boat.getInstance().setAbsoluteWindDirection(Integer.parseInt(parts[2]));
 					break;
 				case WAYPOINTS:
-					this.changeWaypoints(parts[2]);
+					this.updateWaypoints(message);
 					break;
 				case OPERATION_MODE:
 					Boat.createBoat(parts[2]);
+					break;
+				case OBSTACLES:
+					this.updateObstacles(parts[2]);
 					break;
 				default:
 					System.out.println("Unknown set parameter " + parts[2]);
@@ -117,9 +122,11 @@ public class Communication{
 	 * 
 	 * @param wps
 	 */
-	private void changeWaypoints(String wps){
+	private void updateWaypoints(String wps){
 		LinkedList<Position> points = new LinkedList<Position>();
+		wps.replace("set waypoints ", ""); //remove beginning of the message
 		String[] tokens = wps.split(" ");
+		System.out.println("Received " + tokens.length + " wayponts!");
 		for(String token : tokens){
 			String[] waypoint = token.split(";");
 			if(waypoint !=null && waypoint.length == 2){
@@ -128,6 +135,25 @@ public class Communication{
 		}
 		Boat.getInstance().setWaypoints(new Waypoints(points));
 		
+	}
+	
+	/**
+	 * Parses obstacle data from string and updates Boat variable.
+	 * @param obs data string
+	 */
+	private void updateObstacles(String obs){
+		LinkedList<Obstacle> obstacles = new LinkedList<Obstacle>();
+		String[] tokens = obs.split(" ");
+		for(String token : tokens){
+			String[] data = token.split(";");
+			if(data.length == 4){
+				obstacles.add(new Obstacle(
+						new Position(data[0], data[1]),
+						Float.parseFloat(data[2]),
+						Integer.parseInt(data[3])));
+			}
+		}
+		Boat.getInstance().setObstacles(obstacles);
 	}
 	
 	public void clean(){

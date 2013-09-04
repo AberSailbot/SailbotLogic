@@ -1,14 +1,14 @@
 <project default="compile">
 
     <presetdef name="javac">
-<javac includeantruntime="false" />
+		<javac includeantruntime="false" />
     </presetdef>
 
     <target name="clean">
         <delete dir="bin"/>
     </target>
 
-    <target name="compile">
+    <target name="compile" depends="clean">
         <mkdir dir="bin"/>
         <javac srcdir="src" destdir="bin"/>
     </target>
