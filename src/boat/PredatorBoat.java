@@ -1,6 +1,9 @@
 package boat;
 
 import main.Obstacle;
+import utils.Utils;
+
+import java.io.IOException;
 
 /**
  * @author David Capper <dmc2@aber.ac.uk>
@@ -10,6 +13,7 @@ import main.Obstacle;
 public class PredatorBoat extends Boat {
 
     Obstacle target;
+    private boolean shouldSail;
 
     public PredatorBoat()
     {
@@ -23,21 +27,44 @@ public class PredatorBoat extends Boat {
         this.target = t;
     }
 
+    public void stopSailing()
+    {
+        shouldSail = false;
+    }
+
     @Override
     public void sail(){
-        while (true ){
 
+        double headingToTarget;
+        double headingDifference;
 
-            keepHeading(0);
+        while ( shouldSail ){
 
-            this.updateRudder();
-            this.updateSail();
-
-            try{
-                Thread.sleep(300);
-            }catch(InterruptedException e){
-                e.printStackTrace();
+            try {
+                readSensors();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
+
+
+            headingToTarget = Utils.getHeading(position, target.getPosition());
+            headingDifference = Utils.getHeadingDifference(heading, target.getHeading());
+
+            if (targetDistance > 7)
+            {
+                if (headingDifference <= 0 )
+                {
+                    keepHeading((int)Utils.addHeadings(headingToTarget, 10 ));
+                }  else {
+                    keepHeading((int)Utils.addHeadings(headingToTarget, -10 ));
+                }
+            } else {
+                keepHeading((int)Utils.addHeadings(headingToTarget, 180));
+                stopSailing();
+            }
+
+
+
         }
     }
 }
