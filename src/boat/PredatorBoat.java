@@ -1,6 +1,6 @@
 package boat;
 
-import main.Target;
+import main.Obstacle;
 
 /**
  * @author David Capper <dmc2@aber.ac.uk>
@@ -9,14 +9,15 @@ import main.Target;
 
 public class PredatorBoat extends Boat {
 
-    Target target;
+    Obstacle target;
 
     public PredatorBoat()
     {
         super();
+        target = obstacles.get(0);
     }
 
-    public PredatorBoat(Target t)
+    public PredatorBoat(Obstacle t)
     {
         super();
         this.target = t;

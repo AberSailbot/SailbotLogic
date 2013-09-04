@@ -98,9 +98,9 @@ public class PreyBoat extends Boat {
 
         if (headingDifferenceFromCentre <= 0)
         {
-            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), 90);
+            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), 95);
         } else {
-            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), -90);
+            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), -95);
         }
     }
 
