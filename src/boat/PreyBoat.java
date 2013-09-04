@@ -68,7 +68,7 @@ public class PreyBoat extends Boat {
 
             if ( tooCloseToEdge() ){
 
-                  spiralInFromEdge();
+                  spiral(5);
 
             } else {
 
@@ -82,7 +82,7 @@ public class PreyBoat extends Boat {
                     desiredHeading = (((int) Math.abs(targetHeading) ) + 180) % 380;
 
                 } else {
-                     desiredHeading = (getAbsoluteWindDirection() + 180) % 360;
+                   spiral(-5);
 
                 }
             }
@@ -91,16 +91,17 @@ public class PreyBoat extends Boat {
         }
     }
 
-    private void spiralInFromEdge() {
+    //intensity defines the deviation from a perfect circle    (-ve is inwards, +ve is outwards)
+    private void spiral(int intensity) {
 
         int headingDifferenceFromCentre = Utils.getHeadingDifference( (int)Utils.getHeading(centre, position),
                                                                       (int)Utils.getHeading(centre, target.getPosition()));
 
         if (headingDifferenceFromCentre <= 0)
         {
-            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), 95);
+            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), 90 - intensity);
         } else {
-            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), -95);
+            desiredHeading =  (int)Utils.addHeadings(Utils.getHeading(centre, position), -90 + intensity);
         }
     }
 
