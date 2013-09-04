@@ -68,7 +68,7 @@ public class PreyBoat extends Boat {
 
             if ( tooCloseToEdge() ){
 
-                  sailAroundEdge();
+                  spiralInFromEdge();
 
             } else {
 
@@ -91,7 +91,7 @@ public class PreyBoat extends Boat {
         }
     }
 
-    private void sailAroundEdge() {
+    private void spiralInFromEdge() {
 
         int headingDifferenceFromCentre = Utils.getHeadingDifference( (int)Utils.getHeading(centre, position),
                                                                       (int)Utils.getHeading(centre, target.getPosition()));
