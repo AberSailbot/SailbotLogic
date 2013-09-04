@@ -20,6 +20,7 @@ public abstract class Boat{
 	
 	public static final String RACE_MODE = "race";
 	public static final String STATION_KEEPING_MODE = "stationkeeping";
+    public static final String PREY = "prey";
 
 	private static Boat instance;
 	
@@ -92,6 +93,8 @@ public abstract class Boat{
 		case STATION_KEEPING_MODE:
 			instance = new StationKeepingBoat();
 			break;
+        case PREY:
+            instance = new PreyBoat();
 		default:
 			System.out.println("Cannot set boat mode : unknown mode " + type);
 			if(instance == null){

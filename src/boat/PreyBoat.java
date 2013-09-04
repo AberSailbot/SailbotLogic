@@ -1,8 +1,10 @@
 package boat;
 
+import main.Obstacle;
 import main.Position;
-import main.Target;
 import utils.Utils;
+
+import java.io.IOException;
 
 /**
  * @author David Capper <dmc2@aber.ac.uk>
@@ -11,7 +13,7 @@ import utils.Utils;
 
 public class PreyBoat extends Boat {
 
-    Target target;
+    Obstacle target;
     private boolean shouldSail;
     private Position centre;
     int desiredHeading = 0;
@@ -20,6 +22,7 @@ public class PreyBoat extends Boat {
     {
         super();
         shouldSail = true;
+        target = obstacles.get(0);
     }
 
     public void stopSailing()
@@ -27,7 +30,7 @@ public class PreyBoat extends Boat {
         shouldSail = false;
     }
 
-    public PreyBoat(Target t)
+    public PreyBoat(Obstacle t)
     {
         super();
         this.target = t;
@@ -54,7 +57,11 @@ public class PreyBoat extends Boat {
         while (shouldSail)
         {
             //get the position of the other boat
-            target.updateState();
+            try {
+                readSensors();
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             //work out where it is relative to me
             targetDistance = Position.getDistanceBetween(getPosition(), target.getPosition());
             targetHeading = Position.getHeadingBetween(getPosition(), target.getPosition());
@@ -65,8 +72,7 @@ public class PreyBoat extends Boat {
 
             } else {
 
-                //get the position of the other boat
-                target.updateState();
+
                 //work out where it is relative to me
                 targetDistance = Position.getDistanceBetween(getPosition(), target.getPosition());
                 targetHeading = Position.getHeadingBetween(getPosition(), target.getPosition());

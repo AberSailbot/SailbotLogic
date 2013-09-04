@@ -45,6 +45,6 @@ public class Obstacle{
 	public void setHeading(int heading){
 		this.heading = heading;
 	}
-	
-	
+
+
 }
