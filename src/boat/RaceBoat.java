@@ -65,6 +65,13 @@ public class RaceBoat extends Boat{
 				waypointDistance = waypoints.getDistanceToWaypoint();
 			}
 
+			com.sendMessage("set waypointnum "
+					+ waypoints.getNextWaypointNumber());
+			com.sendMessage("set waypointnorthing "
+					+ waypoints.getNextWaypoint().getLat());
+			com.sendMessage("set waypointeasting "
+					+ waypoints.getNextWaypoint().getLon());
+			
 			com.sendMessage("set waypointdistance " + waypointDistance);
 			waypointHeading = waypoints.getWaypointHeading();
 			com.sendMessage("set waypointheading " + waypointHeading);
