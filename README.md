@@ -15,15 +15,6 @@ To compile, simply run ant in the main directory.
 
 ###Running###
 
-<<<<<<< HEAD
-To start the program, go to bin directory and run main.Main class, with waypoints file name as a parameter.
-Before starting SailbotManager, ensure that either tracksailAI simulator or Python emulator is running.
-
->cd bin
-
->java main.Main waypoints.txt
-
-=======
 Before starting SailbotManager, ensure that either tracksailAI simulator or Python emulator is running.
 To start the code in station-keeping branch, go to bin directory and run main.Main class, with two parameters:
  1.operation mode ("station" for station keeping or "race" for just following waypoints)
@@ -37,5 +28,3 @@ e.g.
 >cd bin
 
 >java main.Main station waypoints.txt
->>>>>>> df0376a9ec22f02f6b94c60d27309c89a99d5c58
-
